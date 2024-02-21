@@ -1,0 +1,5 @@
+# Ignore build files.
+.deps/*
+outfile.elf
+outfile.hex
+*.o
