@@ -1,35 +1,22 @@
 #include <pic32mx.h>
-#include "./screenengine.h"
+#include "./gameengine.h"
 #include "./utilities.h"
+#include "./screenengine.h"
 
 int main()
 {
 
-	display_init();
+	game_init();
+
+	struct entity* test_ent = create_entity((struct vector2D){45, 10}, 5, 5);
+	struct entity* test_ent2 = create_entity((struct vector2D){10, 10}, 10, 10);
+	struct entity* test_ent3 = create_entity((struct vector2D){80, 10}, 1, 1);
 
 	while (1)
 	{
-
-		int i;
-		for (i = 0; i < 118; i++)
-		{
-
-			matrix_reset();
-
-			draw_rect(10, 10, i, 20);
-			display_update();
-			tick_delay(100000);
-		}
-
-		for (i = 118; i >= 0; i--)
-		{
-
-			matrix_reset();
-
-			draw_rect(10, 10, i, 20);
-			display_update();
-			tick_delay(100000);
-		}
+		game_tick();
+		game_draw();
+		tick_delay(50000);
 	}
 
 	for (;;)
