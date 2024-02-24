@@ -100,25 +100,25 @@ void game_tick()
         ent->position.x += ent->velocity.x * 0.1;
         ent->position.y += ent->velocity.y * 0.1;
 
-        // Check if the entity is touching the ground.
-        if (get_collision_box(ent).y_bottom >= DISPLAY_HEIGHT)
+        // Check if the entity isn't on the ground.
+        if (!ent->on_ground)
         {
-            ent->on_ground = true;
-            ent->position.y = DISPLAY_HEIGHT;
-            ent->velocity.y = 0;
+            // Apply gravity.
+            ent->velocity.y = ent->velocity.y < 3 ? ent->velocity.y + 0.1 : 3;
+
+            // Check if the entity is touching the ground.
+            if (get_collision_box(ent).y_bottom >= DISPLAY_HEIGHT)
+            {
+                ent->on_ground = true;
+                ent->position.y = DISPLAY_HEIGHT;
+                ent->velocity.y = 0;
+            }
         }
 
         // CHeck if the entity is moving up or down.
         if (ent->position.y < DISPLAY_HEIGHT)
         {
             ent->on_ground = false;
-        }
-
-        // Check if the entity isn't on the ground.
-        if (!ent->on_ground)
-        {
-            // Apply gravity.
-            ent->velocity.y = ent->velocity.y < 3 ? ent->velocity.y + 0.1 : 3;
         }
     }
 }
