@@ -134,7 +134,11 @@ matrix_reset()
 
 void draw_pixel(int x, int y)
 {
-    
+    if (x < 0 || x >= DISPLAY_WIDTH || y < 0 || y >= DISPLAY_HEIGHT)
+    {
+        return;
+    }
+
     int segment = y / 8;
     int columnData = 1 << (y % 8);
     display_matrix[segment][x] |= columnData;
