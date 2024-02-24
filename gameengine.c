@@ -93,16 +93,18 @@ struct label *create_label(char *text, struct vector2D pos, bool centered, bool 
 
             if (centered)
             {
-                while (text[len] != '\0')
+                int j = 0;
+                while (text[j] != '\0')
                 {
                     len += text[len] == ' ' ? 4 : 8;
+                    j++;
                 }
             }
 
             labels[i].active = true;
             labels[i].text = text;
             labels[i].position = pos;
-            labels[i].x_offset = len;
+            labels[i].x_offset = len / 2;
             labels[i].selected = selected;
             return &labels[i];
         }
