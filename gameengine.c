@@ -6,6 +6,18 @@
 #define DISPLAY_HEIGHT 32
 
 #define MAX_ENTITIES 64
+#define MAX_LABELS 8
+#define DRAW_LOOP 64
+
+/*
+Structs
+*/
+
+struct vector2D
+{
+    double x;
+    double y;
+};
 
 struct collision_box
 {
@@ -15,10 +27,10 @@ struct collision_box
     int y_bottom;
 };
 
-struct vector2D
+struct game_object
 {
-    double x;
-    double y;
+    bool active;
+    struct vector2D position;
 };
 
 struct entity
@@ -31,13 +43,25 @@ struct entity
     int height;
 };
 
-struct game_object
+struct label
 {
     bool active;
+    char *text;
     struct vector2D position;
+    int x_offset;
+    bool selected;
 };
 
+/*
+Object arrays
+*/
+
 struct entity entities[MAX_ENTITIES] = {0};
+struct label labels[MAX_LABELS] = {0};
+
+/*
+Creation functions
+*/
 
 struct entity *create_entity(struct vector2D pos, int width, int height)
 {
@@ -60,15 +84,56 @@ struct entity *create_entity(struct vector2D pos, int width, int height)
     }
 }
 
-void set_position(struct entity *ent, struct vector2D pos)
+struct label *create_label(char *text, struct vector2D pos, bool centered, bool selected)
+{
+    // Loop through all labels.
+    int i;
+    for (i = 0; i < MAX_LABELS; i++)
+    {
+        if (!labels[i].active)
+        {
+            int len = 0;
+
+            if (centered)
+            {
+                while (text[len] != '\0')
+                {
+                    len += text[len] == ' ' ? 4 : 8;
+                }
+            }
+
+            labels[i].active = true;
+            labels[i].text = text;
+            labels[i].position = pos;
+            labels[i].x_offset = len;
+            labels[i].selected = selected;
+            return &labels[i];
+        }
+    }
+}
+
+/*
+Setters
+*/
+
+void set_entity_position(struct entity *ent, struct vector2D pos)
 {
     ent->position = pos;
 }
 
-void set_velocity(struct entity *ent, struct vector2D vel)
+void set_label_position(struct label *lbl, struct vector2D pos)
+{
+    lbl->position = pos;
+}
+
+void set_entity_velocity(struct entity *ent, struct vector2D vel)
 {
     ent->velocity = vel;
 }
+
+/*
+Getters
+*/
 
 struct collision_box get_collision_box(struct entity *ent)
 {
@@ -78,6 +143,16 @@ struct collision_box get_collision_box(struct entity *ent)
     box.y_top = ent->position.y - ent->height;
     box.y_bottom = ent->position.y;
     return box;
+}
+
+/*
+Engine functions
+
+*/
+
+void game_init()
+{
+    display_init();
 }
 
 void game_tick()
@@ -123,31 +198,37 @@ void game_tick()
     }
 }
 
-void game_init()
-{
-    display_init();
-}
-
 void game_draw()
 {
     matrix_reset();
 
     // Loop through all entities.
     int i;
-    for (i = 0; i < MAX_ENTITIES; i++)
+    for (i = 0; i < DRAW_LOOP; i++)
     {
-
-        // Get the entity.
-        struct entity *ent = &entities[i];
-
-        // Check if the entity is active.
-        if (!ent->active)
+        if (i < MAX_ENTITIES)
         {
-            continue;
+            // Get the entity.
+            struct entity *ent = &entities[i];
+
+            // Check if the entity is active.
+            if (ent->active)
+            {
+                draw_rect((int)(ent->position.x) - ent->width / 2, (int)(ent->position.y) - ent->height, ent->width, ent->height);
+            }
         }
 
-        // Draw the entity.
-        draw_rect((int)(ent->position.x) - ent->width / 2, (int)(ent->position.y) - ent->height, ent->width, ent->height);
+        if (i < MAX_LABELS)
+        {
+            // Get the label.
+            struct label *lbl = &labels[i];
+
+            // Check if the label is active.
+            if (lbl->active)
+            {
+                draw_string(lbl->text, (int)(lbl->position.x) - lbl->x_offset, (int)(lbl->position.y), lbl->selected);
+            }
+        }
     }
 
     display_update();
