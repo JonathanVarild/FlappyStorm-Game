@@ -1,29 +1,25 @@
-#ifndef GAME_ENGINE_H
-#define GAME_ENGINE_H
-
 #include <stdbool.h>
+#include <stdlib.h>
 
 #define DISPLAY_WIDTH 128
 #define DISPLAY_HEIGHT 32
 
 #define MAX_ENTITIES 64
+#define MAX_LABELS 8
 
-struct collision_box
-{
+struct vector2D {
+    double x;
+    double y;
+};
+
+struct collision_box {
     int x_left;
     int x_right;
     int y_top;
     int y_bottom;
 };
 
-struct vector2D
-{
-    double x;
-    double y;
-};
-
-struct entity
-{
+struct entity {
     bool active;
     struct vector2D position;
     struct vector2D velocity;
@@ -32,21 +28,26 @@ struct entity
     int height;
 };
 
-extern struct entity entities[MAX_ENTITIES];
-
-struct game_object
-{
+struct label {
     bool active;
+    char *text;
     struct vector2D position;
+    int x_offset;
+    bool selected;
 };
 
-// Function prototypes
-struct entity *create_entity(struct vector2D pos, int width, int height);
-void set_position(struct entity *ent, struct vector2D pos);
-void set_velocity(struct entity *ent, struct vector2D vel);
-struct collision_box get_collision_box(struct entity *ent);
-void game_tick(void);
-void game_init(void);
-void game_draw(void);
+extern struct entity entities[MAX_ENTITIES];
+extern struct label labels[MAX_LABELS];
 
-#endif // GAME_ENGINE_H
+struct entity *create_entity(struct vector2D pos, int width, int height);
+struct label *create_label(char *text, struct vector2D pos, bool centered, bool selected);
+
+void set_entity_position(struct entity *ent, struct vector2D pos);
+void set_label_position(struct label *lbl, struct vector2D pos);
+void set_entity_velocity(struct entity *ent, struct vector2D vel);
+
+struct collision_box get_collision_box(struct entity *ent);
+
+void game_init(void);
+void game_tick(void);
+void game_draw(void);
