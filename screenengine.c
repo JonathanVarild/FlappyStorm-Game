@@ -1,6 +1,7 @@
 #include <pic32mx.h>
 #include <stdint.h>
 #include "./utilities.h"
+#include <stdbool.h>
 
 // #define DISPLAY_VDD PORTFbits.RF6
 // #define DISPLAY_VBATT PORTFbits.RF5
@@ -249,7 +250,7 @@ uint8_t text_font[] = {
 	0, 120, 68, 66, 68, 120, 0, 0,
 };
 
-void draw_text(int x, int y, char *text) {
+void draw_text(int x, int y, char *text, bool selected) {
 
     // Declare variables.
     int i, j, k;
@@ -273,7 +274,11 @@ void draw_text(int x, int y, char *text) {
             for (k = 0; k < 8; k++) {
 
                 // Check if the column/pixel should be drawn.
-                if (char_data & (1 << k)) {
+                if (!selected && (char_data & (1 << k))) {
+                    draw_pixel(x + i * 8 + j, y + k);
+                }
+
+                if (selected && !(char_data & (1 << k))) {
                     draw_pixel(x + i * 8 + j, y + k);
                 }
             }
