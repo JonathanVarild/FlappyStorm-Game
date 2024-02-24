@@ -2,9 +2,6 @@
 #include <stdlib.h>
 #include "./screenengine.h"
 
-#define DISPLAY_WIDTH 128
-#define DISPLAY_HEIGHT 32
-
 #define MAX_ENTITIES 64
 #define MAX_LABELS 8
 #define DRAW_LOOP 64

@@ -3,6 +3,9 @@
 #include "./utilities.h"
 #include <stdbool.h>
 
+#define DISPLAY_WIDTH 128
+#define DISPLAY_HEIGHT 32
+
 // #define DISPLAY_VDD PORTFbits.RF6
 // #define DISPLAY_VBATT PORTFbits.RF5
 // #define DISPLAY_COMMAND_DATA PORTFbits.RF4
@@ -131,6 +134,7 @@ matrix_reset()
 
 void draw_pixel(int x, int y)
 {
+    
     int segment = y / 8;
     int columnData = 1 << (y % 8);
     display_matrix[segment][x] |= columnData;
