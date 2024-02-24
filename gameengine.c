@@ -226,7 +226,7 @@ void game_draw()
             // Check if the label is active.
             if (lbl->active)
             {
-                draw_string(lbl->text, (int)(lbl->position.x) - lbl->x_offset, (int)(lbl->position.y), lbl->selected);
+                draw_text((int)(lbl->position.x) - lbl->x_offset, (int)(lbl->position.y), lbl->text,  lbl->selected);
             }
         }
     }
