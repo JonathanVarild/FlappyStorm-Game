@@ -31,13 +31,13 @@ struct entity
     int height;
 };
 
-struct entity entities[MAX_ENTITIES] = {0};
-
 struct game_object
 {
     bool active;
     struct vector2D position;
 };
+
+struct entity entities[MAX_ENTITIES] = {0};
 
 struct entity *create_entity(struct vector2D pos, int width, int height)
 {
@@ -73,10 +73,10 @@ void set_velocity(struct entity *ent, struct vector2D vel)
 struct collision_box get_collision_box(struct entity *ent)
 {
     struct collision_box box;
-    box.x_left = ent->position.x - ent->width / 2;
-    box.x_right = ent->position.x + ent->width / 2;
-    box.y_top = ent->position.y - ent->height / 2;
-    box.y_bottom = ent->position.y + ent->height / 2;
+    box.x_left = ent->position.x;
+    box.x_right = ent->position.x + ent->width;
+    box.y_top = ent->position.y - ent->height;
+    box.y_bottom = ent->position.y;
     return box;
 }
 
@@ -104,7 +104,7 @@ void game_tick()
         if (get_collision_box(ent).y_bottom >= DISPLAY_HEIGHT)
         {
             ent->on_ground = true;
-            ent->position.y = DISPLAY_HEIGHT - ent->height / 2 - 1;
+            ent->position.y = DISPLAY_HEIGHT;
             ent->velocity.y = 0;
         }
 
@@ -118,7 +118,7 @@ void game_tick()
         if (!ent->on_ground)
         {
             // Apply gravity.
-            ent->velocity.y = ent->velocity.y < 5 ? ent->velocity.y + 1 : 5;
+            ent->velocity.y = ent->velocity.y < 3 ? ent->velocity.y + 0.1 : 3;
         }
     }
 }
@@ -147,7 +147,7 @@ void game_draw()
         }
 
         // Draw the entity.
-        draw_rect((int)(ent->position.x) - ent->width / 2, (int)(ent->position.y) - ent->height / 2, ent->width, ent->height);
+        draw_rect((int)(ent->position.x) - ent->width / 2, (int)(ent->position.y) - ent->height, ent->width, ent->height);
     }
 
     display_update();
