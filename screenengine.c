@@ -128,6 +128,13 @@ matrix_reset()
     }
 }
 
+void draw_pixel(int x, int y)
+{
+    int segment = y / 8;
+    int columnData = 1 << (y % 8);
+    display_matrix[segment][x] |= columnData;
+}
+
 void draw_rect(int x, int y, int width, int height)
 {
 
@@ -137,16 +144,12 @@ void draw_rect(int x, int y, int width, int height)
     // Loop through the rows pixel by pixel.
     for (i = y; i < y + height; i++)
     {
-
-        // Calculate the segment and pixel.
-        int segment = i / 8;
-
-        // Calculate the columndata.
-        int columnData = 1 << (i % 8);
-
         for (j = x; j < x + width; j++)
         {
-            display_matrix[segment][j] |= columnData;
+            draw_pixel(j, i);
+        }
+    }
+}
         }
     }
 }
