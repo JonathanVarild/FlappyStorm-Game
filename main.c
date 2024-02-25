@@ -4,7 +4,6 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
-
 int main()
 {
 
@@ -20,13 +19,6 @@ int main()
 	struct entity* test_ent = create_entity((struct vector2D){0, 20}, 10, 10);
 	set_entity_graphic(test_ent, smiley);
 	set_entity_velocity(test_ent, (struct vector2D){10, 0});
-
-	while (1)
-	{
-		game_tick();
-		game_draw();
-		tick_delay(50000);
-	}
 
 	for (;;)
 		;

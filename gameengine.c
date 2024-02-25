@@ -159,6 +159,17 @@ Engine functions
 void game_init()
 {
     display_init();
+
+	T2CON = 0x0;			// Stop any existing timer2 and clear control register
+	T2CONSET = 0x70;		// Set prescaler to 1:256
+	PR2 = 1562;			    // Set period register to ((0.005 * 80000000) / 256) = 1562
+	TMR2 = 0x0;				// Clear the timer register
+	IFSCLR(0) = 0x100;		// Clear the Timer 2 interrupt flag
+	IECSET(0) = 0x100;		// Enable Timer 2 interrupts
+	T2CONSET = 0x8000;		// Start Timer 2
+	IPCSET(2) = 0x1A;		// Set priority level to 7 (0001 1100)
+
+	enable_interrupt();    
 }
 
 void game_tick()
@@ -251,4 +262,19 @@ void game_draw()
     }
 
     display_update();
+}
+
+/*
+Interrupts
+*/
+
+void user_isr(void)
+{
+	if (IFS(0) & 0x100)
+	{
+        // Update the game.
+        game_tick();
+        game_draw();
+		IFSCLR(0) = 0x100;
+	}
 }
