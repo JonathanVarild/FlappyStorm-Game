@@ -181,6 +181,12 @@ void game_tick()
         ent->position.x += ent->velocity.x * 0.1;
         ent->position.y += ent->velocity.y * 0.1;
 
+        // Check if x velocity isn't 0.
+        if (ent->velocity.x != 0)
+        {
+            ent->velocity.x = ent->on_ground ? ent->velocity.x * 0.94 : ent->velocity.x * 0.98;
+        }
+
         // Check if the entity isn't on the ground.
         if (!ent->on_ground)
         {
