@@ -13,17 +13,13 @@ int main()
 
 	game_init();
 
-	struct entity* test_ent4 = create_entity((struct vector2D){45, 25}, 10, 10);
-	struct entity* test_ent = create_entity((struct vector2D){45, 10}, 5, 5);
-	struct entity* test_ent2 = create_entity((struct vector2D){10, 10}, 10, 10);
-	struct entity* test_ent3 = create_entity((struct vector2D){80, 10}, 1, 1);
-	struct entity* test_ent5 = create_entity((struct vector2D){100, 10}, 2, 2);
-	struct entity* test_ent6 = create_entity((struct vector2D){100, 10}, 3, 3);
+	struct label* test_lbl = create_label("FlappyStorm", (struct vector2D){64, 0}, true, true);
 
-	set_entity_graphic(test_ent2, smiley);
+	struct entity* reference_entity = create_entity((struct vector2D){45, 0}, 1, 1);
 
-	struct label* test_lbl = create_label("Cent+Sel", (struct vector2D){64, 0}, true, true);
-	struct label* test_lbl2 = create_label("Normal", (struct vector2D){64, 10}, false, false);
+	struct entity* test_ent = create_entity((struct vector2D){0, 20}, 10, 10);
+	set_entity_graphic(test_ent, smiley);
+	set_entity_velocity(test_ent, (struct vector2D){10, 0});
 
 	while (1)
 	{
