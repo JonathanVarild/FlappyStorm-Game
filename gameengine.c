@@ -1,6 +1,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include "./screenengine.h"
+#include <stdint.h>
 
 #define MAX_ENTITIES 64
 #define MAX_LABELS 8
@@ -38,6 +39,7 @@ struct entity
     bool on_ground;
     int width;
     int height;
+    uint8_t *graphic;
 };
 
 struct label
@@ -130,6 +132,11 @@ void set_entity_velocity(struct entity *ent, struct vector2D vel)
     ent->velocity = vel;
 }
 
+void set_entity_graphic(struct entity *ent, uint8_t *graphic)
+{
+    ent->graphic = graphic;
+}
+
 /*
 Getters
 */
@@ -213,7 +220,14 @@ void game_draw()
             // Check if the entity is active.
             if (ent->active)
             {
-                draw_rect((int)(ent->position.x) - ent->width / 2, (int)(ent->position.y) - ent->height, ent->width, ent->height);
+                if (ent->graphic != NULL)
+                {
+                    draw_graphic((int)(ent->position.x) - ent->width / 2, (int)(ent->position.y) - ent->height, ent->width, ent->height, ent->graphic);
+                }
+                else
+                {
+                    draw_rect((int)(ent->position.x) - ent->width / 2, (int)(ent->position.y) - ent->height, ent->width, ent->height);
+                }
             }
         }
 

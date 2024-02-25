@@ -1,5 +1,6 @@
 #include <stdbool.h>
 #include <stdlib.h>
+#include <stdint.h>
 
 #define MAX_ENTITIES 64
 #define MAX_LABELS 8
@@ -23,6 +24,7 @@ struct entity {
     bool on_ground;
     int width;
     int height;
+    uint8_t *graphic;
 };
 
 struct label {
@@ -42,6 +44,7 @@ struct label *create_label(char *text, struct vector2D pos, bool centered, bool 
 void set_entity_position(struct entity *ent, struct vector2D pos);
 void set_label_position(struct label *lbl, struct vector2D pos);
 void set_entity_velocity(struct entity *ent, struct vector2D vel);
+void set_entity_graphic(struct entity *ent, uint8_t *graphic);
 
 struct collision_box get_collision_box(struct entity *ent);
 
