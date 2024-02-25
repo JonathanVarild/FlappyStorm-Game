@@ -293,3 +293,25 @@ void draw_text(int x, int y, char *text, bool selected) {
         }
     }
 }
+
+void draw_graphic(int x, int y, int width, int height, uint8_t *graphic) {
+    
+    int data = graphic[0];
+    int index = 0;
+    int line = 0;
+
+    width = width + (8 - width % 8);
+
+    while (index < width * height) {
+
+        if (data & (1 << (index % 8))) {
+            draw_pixel(x + (index % width), y + (index / width));
+        }
+
+        index++;
+        data = graphic[index / 8];
+        if (index) {
+            line++;
+        }
+    }
+}

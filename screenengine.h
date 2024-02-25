@@ -13,3 +13,4 @@ void matrix_reset(void);
 void draw_pixel(int x, int y);
 void draw_rect(int x, int y, int width, int height);
 void draw_text(int x, int y, char *text, bool selected);
+void draw_graphic(int x, int y, int width, int height, uint8_t *graphic);
