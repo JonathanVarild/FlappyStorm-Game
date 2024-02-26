@@ -29,6 +29,8 @@ struct game_object
 {
     bool active;
     struct vector2D position;
+    int width;
+    int height;
 };
 
 struct entity

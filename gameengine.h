@@ -20,6 +20,14 @@ struct collision_box {
     int y_bottom;
 };
 
+struct game_object
+{
+    bool active;
+    struct vector2D position;
+    int width;
+    int height;
+};
+
 struct entity {
     bool active;
     struct vector2D position;
