@@ -137,6 +137,11 @@ void set_entity_graphic(struct entity *ent, uint8_t *graphic)
     ent->graphic = graphic;
 }
 
+void set_label_selected(struct label *lbl, bool selected)
+{
+    lbl->selected = selected;
+}
+
 /*
 Getters
 */
