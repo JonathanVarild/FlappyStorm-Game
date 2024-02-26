@@ -211,11 +211,11 @@ void set_label_selected(struct label *lbl, bool selected)
     lbl->selected = selected;
 }
 
-void set_label_text(struct label *lbl, char *text)
+void set_label_text(struct label *lbl, char *text, bool centered)
 {
     lbl->text = text;
 
-    if (lbl->x_offset != 0)
+    if (centered)
     {
         int len = 0;
         int j = 0;

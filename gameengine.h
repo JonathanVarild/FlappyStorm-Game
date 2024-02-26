@@ -72,7 +72,7 @@ void set_entity_velocity(struct entity *ent, struct vector2D vel);
 void set_game_object_graphic(struct game_object *obj, uint8_t *graphic);
 void set_entity_graphic(struct entity *ent, uint8_t *graphic);
 void set_label_selected(struct label *lbl, bool selected);
-void set_label_text(struct label *lbl, char *text);
+void set_label_text(struct label *lbl, char *text, bool centered);
 
 struct collision_box get_game_object_collision_box(struct game_object *obj);
 struct collision_box get_entity_collision_box(struct entity *ent);
