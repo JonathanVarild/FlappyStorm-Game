@@ -1,4 +1,4 @@
-#include "./gameengine.h"
+#include "gameengine.h"
 #include <stdbool.h>
 #include "icons.h"
 

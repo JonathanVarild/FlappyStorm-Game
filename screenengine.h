@@ -3,7 +3,7 @@
 
 #include <pic32mx.h>
 #include <stdint.h>
-#include "./utilities.h"
+#include "utilities.h"
 #include <stdbool.h>
 
 #define DISPLAY_WIDTH 128

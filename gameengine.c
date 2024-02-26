@@ -1,6 +1,6 @@
 #include <stdbool.h>
 #include <stdlib.h>
-#include "./screenengine.h"
+#include "screenengine.h"
 #include <stdint.h>
 
 #define MAX_ENTITIES 64
