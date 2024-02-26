@@ -226,6 +226,9 @@ void set_label_text(struct label *lbl, char *text, bool centered)
         }
         lbl->x_offset = len / 2;
     }
+    else {
+        lbl->x_offset = 0;
+    }
 }
 
 /*
