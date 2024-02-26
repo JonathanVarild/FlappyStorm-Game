@@ -3,6 +3,7 @@
 #include "icons.h"
 
 struct entity *player;
+struct game_object *cloud;
 
 void jump()
 {
@@ -21,7 +22,7 @@ void go_right()
 
 void update_gamescene()
 {
-    set_entity_velocity(player, (struct vector2D){4, player->velocity.y});
+    set_game_object_position(cloud, (struct vector2D){cloud->position.x + 0.1, cloud->position.y});
 }
 
 void init_gamescene()
@@ -32,9 +33,12 @@ void init_gamescene()
 
     on_game_tick = update_gamescene;
 
-    player = create_entity((struct vector2D){0, 20}, 10, 8);
+    player = create_entity((struct vector2D){0, 20}, icon_bird_width, icon_bird_height);
     set_entity_graphic(player, icon_bird);
     set_entity_velocity(player, (struct vector2D){10, 0});
+
+    cloud = create_game_object((struct vector2D){-10, 20}, icon_cloud_width, icon_cloud_height);
+    set_game_object_graphic(cloud, icon_cloud);
 }
 
 void unload_gamescene()
