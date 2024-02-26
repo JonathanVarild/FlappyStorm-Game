@@ -62,6 +62,11 @@ void update_gamescene()
     {
         remove_game_object(lightning);
     }
+
+    if (player->on_ground) {
+        set_label_text(score_label, "Game Over", true);
+        set_game_state(true);
+    }
 }
 
 void init_gamescene()
