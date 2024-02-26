@@ -280,15 +280,6 @@ void game_init()
 	T2CONSET = 0x8000;		// Start Timer 2
 	IPCSET(2) = 0x1A;		// Set priority level to 7 (0001 1100)
 
-	T3CON = 0x0;			// Stop any existing timer3 and clear control register
-	T3CONSET = 0x70;		// Set prescaler to 1:256
-	PR3 = 1562;			    // Set period register to ((0.01 * 80000000) / 256) = 3125
-	TMR3 = 0x0;				// Clear the timer register
-	IFSCLR(0) = 0x1000;		// Clear the Timer 3 interrupt flag
-	IECSET(0) = 0x1000;		// Enable Timer 3 interrupts
-	T3CONSET = 0x8000;		// Start Timer 3
-	IPCSET(3) = 0x1A;		// Set priority level to 7 (0001 1100)
-
     // Enable interrupts.
 	enable_interrupt();    
 }
@@ -428,16 +419,12 @@ bool button_2_activated = false;
 
 void user_isr(void)
 {
-    // Check if the Timer 3 interrupt flag is set.
-    if (IFS(0) & 0x1000)
-    {
-        game_uptime += 0.01;
-        IFSCLR(0) = 0x1000;
-    }
-
     // Check if the Timer 2 interrupt flag is set.
 	if (IFS(0) & 0x100)
 	{
+        // Increment the game uptime.
+        game_uptime += 0.01;
+
         // Update the game.
         game_tick();
         game_draw();
