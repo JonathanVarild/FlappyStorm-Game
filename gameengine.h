@@ -9,6 +9,8 @@
 #define MAX_ENTITIES 32
 #define MAX_LABELS 8
 
+extern double get_game_uptime(void);
+
 struct vector2D {
     double x;
     double y;
@@ -27,16 +29,19 @@ struct game_object
     struct vector2D position;
     int width;
     int height;
+    double age;
     uint8_t *graphic;
 };
 
-struct entity {
+struct entity
+{
     bool active;
     struct vector2D position;
     struct vector2D velocity;
     bool on_ground;
     int width;
     int height;
+    double age;
     uint8_t *graphic;
 };
 
