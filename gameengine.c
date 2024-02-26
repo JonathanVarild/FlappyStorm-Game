@@ -160,6 +160,14 @@ void game_init()
 {
     display_init();
 
+    // Set up clicky buttons as inputs.
+    TRISDSET = 0x7F0;
+
+    // Enable interrupts for buttons.
+    IECSET(0) = 0x180000; // Enable interrupts for buttons.
+    IPCSET(4) = 0x1F000000; // Set priority level to 7 (1111 0000 0000 0000 0000 0000 0000 0000)
+
+    // Set up Timer 2 interrupt with a period of 0.005 seconds. (200 fps / ticks per second)
 	T2CON = 0x0;			// Stop any existing timer2 and clear control register
 	T2CONSET = 0x70;		// Set prescaler to 1:256
 	PR2 = 1562;			    // Set period register to ((0.005 * 80000000) / 256) = 1562
@@ -169,6 +177,7 @@ void game_init()
 	T2CONSET = 0x8000;		// Start Timer 2
 	IPCSET(2) = 0x1A;		// Set priority level to 7 (0001 1100)
 
+    // Enable interrupts.
 	enable_interrupt();    
 }
 
@@ -268,6 +277,10 @@ void game_draw()
 Interrupts
 */
 
+void (*button_4_down)(void);
+void (*button_3_down)(void);
+void (*button_2_down)(void);
+
 void user_isr(void)
 {
 	if (IFS(0) & 0x100)
@@ -277,4 +290,24 @@ void user_isr(void)
         game_draw();
 		IFSCLR(0) = 0x100;
 	}
+
+    int buttonData = ((PORTD & 0xE0) >> 5);
+
+    // Check if clicky button 4 is pressed.
+    if (buttonData & 0b100 && button_4_down)
+    {
+        button_4_down();
+    }
+
+    // Check if clicky button 3 is pressed.
+    if (buttonData & 0b010 && button_3_down)
+    {
+        button_3_down();
+    }
+
+    // Check if clicky button 2 is pressed.
+    if (buttonData & 0b001 && button_2_down)
+    {
+        button_2_down();
+    }
 }

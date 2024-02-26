@@ -51,3 +51,7 @@ struct collision_box get_collision_box(struct entity *ent);
 void game_init(void);
 void game_tick(void);
 void game_draw(void);
+
+void (*button_4_down)(void);
+void (*button_3_down)(void);
+void (*button_2_down)(void);
