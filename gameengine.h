@@ -1,3 +1,6 @@
+#ifndef GAMEENGINE_H
+#define GAMEENGINE_H
+
 #include <stdbool.h>
 #include <stdlib.h>
 #include <stdint.h>
@@ -53,6 +56,8 @@ void game_init(void);
 void game_tick(void);
 void game_draw(void);
 
-void (*button_4_click)(void);
-void (*button_3_click)(void);
-void (*button_2_click)(void);
+extern void (*button_4_click)(void);
+extern void (*button_3_click)(void);
+extern void (*button_2_click)(void);
+
+#endif
