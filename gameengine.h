@@ -45,6 +45,7 @@ void set_entity_position(struct entity *ent, struct vector2D pos);
 void set_label_position(struct label *lbl, struct vector2D pos);
 void set_entity_velocity(struct entity *ent, struct vector2D vel);
 void set_entity_graphic(struct entity *ent, uint8_t *graphic);
+void set_label_selected(struct label *lbl, bool selected);
 
 struct collision_box get_collision_box(struct entity *ent);
 
