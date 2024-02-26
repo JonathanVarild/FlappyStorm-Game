@@ -3,9 +3,21 @@
 #include "screenengine.h"
 #include <stdint.h>
 
-#define MAX_ENTITIES 64
+#define MAX_GAME_OBJECTS 32
+#define MAX_ENTITIES 32
 #define MAX_LABELS 8
 #define DRAW_LOOP 64
+
+/*
+Utility functions
+*/
+
+double game_uptime = 0;
+
+double get_game_uptime()
+{
+    return game_uptime;
+}
 
 /*
 Structs
@@ -29,6 +41,10 @@ struct game_object
 {
     bool active;
     struct vector2D position;
+    int width;
+    int height;
+    double age;
+    uint8_t *graphic;
 };
 
 struct entity
@@ -39,6 +55,7 @@ struct entity
     bool on_ground;
     int width;
     int height;
+    double age;
     uint8_t *graphic;
 };
 
@@ -55,12 +72,31 @@ struct label
 Object arrays
 */
 
+struct game_object game_objects[MAX_GAME_OBJECTS] = {0};
 struct entity entities[MAX_ENTITIES] = {0};
 struct label labels[MAX_LABELS] = {0};
 
 /*
 Creation functions
 */
+
+struct game_object *create_game_object(struct vector2D pos, int width, int height)
+{
+    // Loop through all game objects.
+    int i;
+    for (i = 0; i < MAX_GAME_OBJECTS; i++)
+    {
+        if (!game_objects[i].active)
+        {
+            game_objects[i].active = true;
+            game_objects[i].position = pos;
+            game_objects[i].width = width;
+            game_objects[i].height = height;
+            game_objects[i].age = get_game_uptime();
+            return &game_objects[i];
+        }
+    }
+}
 
 struct entity *create_entity(struct vector2D pos, int width, int height)
 {
@@ -78,6 +114,7 @@ struct entity *create_entity(struct vector2D pos, int width, int height)
             entities[i].on_ground = false;
             entities[i].width = width;
             entities[i].height = height;
+            entities[i].age = get_game_uptime();
             return &entities[i];
         }
     }
@@ -114,8 +151,35 @@ struct label *create_label(char *text, struct vector2D pos, bool centered, bool 
 }
 
 /*
+Removal functions
+*/
+
+void remove_game_object(struct game_object *obj)
+{
+    obj->active = false;
+    obj->graphic = NULL;
+}
+
+void remove_entity(struct entity *ent)
+{
+    ent->active = false;
+    ent->graphic = NULL;
+}
+
+void remove_label(struct label *lbl)
+{
+    lbl->active = false;
+    lbl->text = NULL;
+}
+
+/*
 Setters
 */
+
+void set_game_object_position(struct game_object *obj, struct vector2D pos)
+{
+    obj->position = pos;
+}
 
 void set_entity_position(struct entity *ent, struct vector2D pos)
 {
@@ -132,6 +196,11 @@ void set_entity_velocity(struct entity *ent, struct vector2D vel)
     ent->velocity = vel;
 }
 
+void set_game_object_graphic(struct game_object *obj, uint8_t *graphic)
+{
+    obj->graphic = graphic;
+}
+
 void set_entity_graphic(struct entity *ent, uint8_t *graphic)
 {
     ent->graphic = graphic;
@@ -142,11 +211,41 @@ void set_label_selected(struct label *lbl, bool selected)
     lbl->selected = selected;
 }
 
+void set_label_text(struct label *lbl, char *text, bool centered)
+{
+    lbl->text = text;
+
+    if (centered)
+    {
+        int len = 0;
+        int j = 0;
+        while (text[j] != '\0')
+        {
+            len += text[len] == ' ' ? 4 : 8;
+            j++;
+        }
+        lbl->x_offset = len / 2;
+    }
+    else {
+        lbl->x_offset = 0;
+    }
+}
+
 /*
 Getters
 */
 
-struct collision_box get_collision_box(struct entity *ent)
+struct collision_box get_game_object_collision_box(struct game_object *obj)
+{
+    struct collision_box box;
+    box.x_left = obj->position.x;
+    box.x_right = obj->position.x + obj->width;
+    box.y_top = obj->position.y - obj->height;
+    box.y_bottom = obj->position.y;
+    return box;
+}
+
+struct collision_box get_entity_collision_box(struct entity *ent)
 {
     struct collision_box box;
     box.x_left = ent->position.x;
@@ -158,8 +257,20 @@ struct collision_box get_collision_box(struct entity *ent)
 
 /*
 Engine functions
-
 */
+
+void (*on_game_tick)(void);
+bool game_paused = false;
+
+void set_game_state(bool paused)
+{
+    game_paused = paused;
+}
+
+bool get_game_state()
+{
+    return game_paused;
+}
 
 void game_init()
 {
@@ -175,7 +286,7 @@ void game_init()
     // Set up Timer 2 interrupt with a period of 0.005 seconds. (200 fps / ticks per second)
 	T2CON = 0x0;			// Stop any existing timer2 and clear control register
 	T2CONSET = 0x70;		// Set prescaler to 1:256
-	PR2 = 1562;			    // Set period register to ((0.005 * 80000000) / 256) = 1562
+	PR2 = 1562;			    // Set period register to ((0.01 * 80000000) / 256) = 1562
 	TMR2 = 0x0;				// Clear the timer register
 	IFSCLR(0) = 0x100;		// Clear the Timer 2 interrupt flag
 	IECSET(0) = 0x100;		// Enable Timer 2 interrupts
@@ -188,6 +299,12 @@ void game_init()
 
 void game_tick()
 {
+    // Call on_game_tick function.
+    if (on_game_tick != NULL)
+    {
+        on_game_tick();
+    }
+
     // Loop through all entities.
     int i;
     for (i = 0; i < MAX_ENTITIES; i++)
@@ -219,13 +336,13 @@ void game_tick()
             ent->velocity.y = ent->velocity.y < 3 ? ent->velocity.y + 0.1 : 3;
 
             // Check if the entity is touching the ground.
-            if (get_collision_box(ent).y_bottom >= DISPLAY_HEIGHT)
+            if (get_entity_collision_box(ent).y_bottom >= DISPLAY_HEIGHT)
             {
                 ent->on_ground = true;
                 ent->position.y = DISPLAY_HEIGHT;
                 ent->velocity.y = 0;
             }
-            else if (get_collision_box(ent).y_bottom < 0)
+            else if (get_entity_collision_box(ent).y_bottom < 0)
             {
                 ent->position.y = 0;
                 ent->velocity.y = 0;
@@ -248,6 +365,24 @@ void game_draw()
     int i;
     for (i = 0; i < DRAW_LOOP; i++)
     {
+        if (i < MAX_GAME_OBJECTS) {
+            // Get the game object.
+            struct game_object *obj = &game_objects[i];
+
+            // Check if the game object is active.
+            if (obj->active)
+            {
+                if (obj->graphic != NULL)
+                {
+                    draw_graphic((int)(obj->position.x) - obj->width / 2, (int)(obj->position.y) - obj->height, obj->width, obj->height, obj->graphic);
+                }
+                else
+                {
+                    draw_rect((int)(obj->position.x) - obj->width / 2, (int)(obj->position.y) - obj->height, obj->width, obj->height);
+                }
+            }
+        }
+
         if (i < MAX_ENTITIES)
         {
             // Get the entity.
@@ -299,11 +434,16 @@ void user_isr(void)
 {
     // Check if the Timer 2 interrupt flag is set.
 	if (IFS(0) & 0x100)
-	{
-        // Update the game.
-        game_tick();
-        game_draw();
-		IFSCLR(0) = 0x100;
+	{   
+        if (!game_paused) {
+            // Increment the game uptime.
+            game_uptime += 0.01;
+
+            // Update the game.
+            game_tick();
+            game_draw();
+        }
+        IFSCLR(0) = 0x100;
 	}
 
     // Get the button data.
