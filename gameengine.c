@@ -204,8 +204,16 @@ void game_init()
 	enable_interrupt();    
 }
 
+void (*on_game_tick)(void);
+
 void game_tick()
 {
+    // Call on_game_tick function.
+    if (on_game_tick != NULL)
+    {
+        on_game_tick();
+    }
+
     // Loop through all entities.
     int i;
     for (i = 0; i < MAX_ENTITIES; i++)

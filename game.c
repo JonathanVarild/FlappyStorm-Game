@@ -19,11 +19,18 @@ void go_right()
     set_entity_velocity(player, (struct vector2D){1, player->velocity.y});
 }
 
+void update_gamescene()
+{
+    set_entity_velocity(player, (struct vector2D){4, player->velocity.y});
+}
+
 void init_gamescene()
 {
     button_4_click = jump;
 	button_3_click = go_left;
 	button_2_click = go_right;
+
+    on_game_tick = update_gamescene;
 
     player = create_entity((struct vector2D){0, 20}, 10, 8);
     set_entity_graphic(player, icon_bird);

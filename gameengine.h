@@ -63,6 +63,8 @@ void set_label_selected(struct label *lbl, bool selected);
 
 struct collision_box get_collision_box(struct entity *ent);
 
+extern void (*on_game_tick)(void);
+
 void game_init(void);
 void game_tick(void);
 void game_draw(void);
