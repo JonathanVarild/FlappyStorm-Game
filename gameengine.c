@@ -114,6 +114,22 @@ struct label *create_label(char *text, struct vector2D pos, bool centered, bool 
 }
 
 /*
+Removal functions
+*/
+
+void remove_entity(struct entity *ent)
+{
+    ent->active = false;
+    ent->graphic = NULL;
+}
+
+void remove_label(struct label *lbl)
+{
+    lbl->active = false;
+    lbl->text = NULL;
+}
+
+/*
 Setters
 */
 

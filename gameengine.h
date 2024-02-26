@@ -44,6 +44,9 @@ extern struct label labels[MAX_LABELS];
 struct entity *create_entity(struct vector2D pos, int width, int height);
 struct label *create_label(char *text, struct vector2D pos, bool centered, bool selected);
 
+void remove_entity(struct entity *ent);
+void remove_label(struct label *lbl);
+
 void set_entity_position(struct entity *ent, struct vector2D pos);
 void set_label_position(struct label *lbl, struct vector2D pos);
 void set_entity_velocity(struct entity *ent, struct vector2D vel);
