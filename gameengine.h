@@ -52,6 +52,6 @@ void game_init(void);
 void game_tick(void);
 void game_draw(void);
 
-void (*button_4_down)(void);
-void (*button_3_down)(void);
-void (*button_2_down)(void);
+void (*button_4_click)(void);
+void (*button_3_click)(void);
+void (*button_2_click)(void);

@@ -23,9 +23,9 @@ void go_right()
 
 int main()
 {
-	button_4_down = jump;
-	button_3_down = go_left;
-	button_2_down = go_right;
+	button_4_click = jump;
+	button_3_click = go_left;
+	button_2_click = go_right;
 
 	static uint8_t smiley[] = {
 		0x00,

@@ -282,12 +282,17 @@ void game_draw()
 Interrupts
 */
 
-void (*button_4_down)(void);
-void (*button_3_down)(void);
-void (*button_2_down)(void);
+void (*button_4_click)(void);
+void (*button_3_click)(void);
+void (*button_2_click)(void);
+
+bool button_4_activated = false;
+bool button_3_activated = false;
+bool button_2_activated = false;
 
 void user_isr(void)
 {
+    // Check if the Timer 2 interrupt flag is set.
 	if (IFS(0) & 0x100)
 	{
         // Update the game.
@@ -296,23 +301,39 @@ void user_isr(void)
 		IFSCLR(0) = 0x100;
 	}
 
+    // Get the button data.
     int buttonData = ((PORTD & 0xE0) >> 5);
+    bool button_4_down = buttonData & 0b100;
+    bool button_3_down = buttonData & 0b010;
+    bool button_2_down = buttonData & 0b001;
 
     // Check if clicky button 4 is pressed.
-    if (buttonData & 0b100 && button_4_down)
+    if (button_4_down && button_4_click != NULL && !button_4_activated)
     {
-        button_4_down();
+        button_4_click();
+        button_4_activated = true;
+    }
+    else if(!button_4_down && button_4_activated) {
+        button_4_activated = false;
     }
 
     // Check if clicky button 3 is pressed.
-    if (buttonData & 0b010 && button_3_down)
+    if (button_3_down && button_3_click != NULL && !button_3_activated)
     {
-        button_3_down();
+        button_3_click();
+        button_3_activated = true;
+    }
+    else if(!button_3_down && button_3_activated) {
+        button_3_activated = false;
     }
 
     // Check if clicky button 2 is pressed.
-    if (buttonData & 0b001 && button_2_down)
+    if (button_2_down && button_2_click != NULL && !button_2_activated)
     {
-        button_2_down();
+        button_2_click();
+        button_2_activated = true;
+    }
+    else if(!button_2_down && button_2_activated) {
+        button_2_activated = false;
     }
 }
