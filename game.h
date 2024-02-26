@@ -7,5 +7,6 @@
 
 // Initializes the game scene
 void init_gamescene(void);
+void unload_gamescene(void);
 
 #endif

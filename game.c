@@ -25,9 +25,12 @@ void init_gamescene()
 	button_3_click = go_left;
 	button_2_click = go_right;
 
-    struct label *test_lbl = create_label("FlappyStorm", (struct vector2D){64, 0}, true, true);
-
     player = create_entity((struct vector2D){0, 20}, 10, 8);
     set_entity_graphic(player, icon_bird);
     set_entity_velocity(player, (struct vector2D){10, 0});
+}
+
+void unload_gamescene()
+{
+    remove_entity(player);
 }
