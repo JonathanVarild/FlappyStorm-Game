@@ -196,6 +196,23 @@ void set_label_selected(struct label *lbl, bool selected)
     lbl->selected = selected;
 }
 
+void set_label_text(struct label *lbl, char *text)
+{
+    lbl->text = text;
+
+    if (lbl->x_offset != 0)
+    {
+        int len = 0;
+        int j = 0;
+        while (text[j] != '\0')
+        {
+            len += text[len] == ' ' ? 4 : 8;
+            j++;
+        }
+        lbl->x_offset = len / 2;
+    }
+}
+
 /*
 Getters
 */
