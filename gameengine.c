@@ -220,6 +220,11 @@ void game_tick()
                 ent->position.y = DISPLAY_HEIGHT;
                 ent->velocity.y = 0;
             }
+            else if (get_collision_box(ent).y_bottom < 0)
+            {
+                ent->position.y = 0;
+                ent->velocity.y = 0;
+            }
         }
 
         // CHeck if the entity is moving up or down.
