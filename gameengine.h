@@ -79,6 +79,7 @@ struct collision_box get_entity_collision_box(struct entity *ent);
 
 extern void (*on_game_tick)(void);
 
+void set_game_state(bool paused);
 void game_init(void);
 void game_tick(void);
 void game_draw(void);

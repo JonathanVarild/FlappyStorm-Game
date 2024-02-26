@@ -257,10 +257,20 @@ struct collision_box get_entity_collision_box(struct entity *ent)
 
 /*
 Engine functions
-
 */
 
 void (*on_game_tick)(void);
+bool game_paused = false;
+
+void set_game_state(bool paused)
+{
+    game_paused = paused;
+}
+
+bool get_game_state()
+{
+    return game_paused;
+}
 
 void game_init()
 {
@@ -424,14 +434,16 @@ void user_isr(void)
 {
     // Check if the Timer 2 interrupt flag is set.
 	if (IFS(0) & 0x100)
-	{
-        // Increment the game uptime.
-        game_uptime += 0.01;
+	{   
+        if (!game_paused) {
+            // Increment the game uptime.
+            game_uptime += 0.01;
 
-        // Update the game.
-        game_tick();
-        game_draw();
-		IFSCLR(0) = 0x100;
+            // Update the game.
+            game_tick();
+            game_draw();
+        }
+        IFSCLR(0) = 0x100;
 	}
 
     // Get the button data.
