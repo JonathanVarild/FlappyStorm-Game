@@ -3,7 +3,8 @@
 #include "screenengine.h"
 #include <stdint.h>
 
-#define MAX_ENTITIES 64
+#define MAX_GAME_OBJECTS 32
+#define MAX_ENTITIES 32
 #define MAX_LABELS 8
 #define DRAW_LOOP 64
 
@@ -31,6 +32,7 @@ struct game_object
     struct vector2D position;
     int width;
     int height;
+    uint8_t *graphic;
 };
 
 struct entity
@@ -57,12 +59,30 @@ struct label
 Object arrays
 */
 
+struct game_object game_objects[MAX_GAME_OBJECTS] = {0};
 struct entity entities[MAX_ENTITIES] = {0};
 struct label labels[MAX_LABELS] = {0};
 
 /*
 Creation functions
 */
+
+struct game_object *create_game_object(struct vector2D pos, int width, int height)
+{
+    // Loop through all game objects.
+    int i;
+    for (i = 0; i < MAX_GAME_OBJECTS; i++)
+    {
+        if (!game_objects[i].active)
+        {
+            game_objects[i].active = true;
+            game_objects[i].position = pos;
+            game_objects[i].width = width;
+            game_objects[i].height = height;
+            return &game_objects[i];
+        }
+    }
+}
 
 struct entity *create_entity(struct vector2D pos, int width, int height)
 {
@@ -119,6 +139,12 @@ struct label *create_label(char *text, struct vector2D pos, bool centered, bool 
 Removal functions
 */
 
+void remove_game_object(struct game_object *obj)
+{
+    obj->active = false;
+    obj->graphic = NULL;
+}
+
 void remove_entity(struct entity *ent)
 {
     ent->active = false;
@@ -135,6 +161,11 @@ void remove_label(struct label *lbl)
 Setters
 */
 
+void set_game_object_position(struct game_object *obj, struct vector2D pos)
+{
+    obj->position = pos;
+}
+
 void set_entity_position(struct entity *ent, struct vector2D pos)
 {
     ent->position = pos;
@@ -148,6 +179,11 @@ void set_label_position(struct label *lbl, struct vector2D pos)
 void set_entity_velocity(struct entity *ent, struct vector2D vel)
 {
     ent->velocity = vel;
+}
+
+void set_game_object_graphic(struct game_object *obj, uint8_t *graphic)
+{
+    obj->graphic = graphic;
 }
 
 void set_entity_graphic(struct entity *ent, uint8_t *graphic)
@@ -164,7 +200,17 @@ void set_label_selected(struct label *lbl, bool selected)
 Getters
 */
 
-struct collision_box get_collision_box(struct entity *ent)
+struct collision_box get_game_object_collision_box(struct game_object *obj)
+{
+    struct collision_box box;
+    box.x_left = obj->position.x;
+    box.x_right = obj->position.x + obj->width;
+    box.y_top = obj->position.y - obj->height;
+    box.y_bottom = obj->position.y;
+    return box;
+}
+
+struct collision_box get_entity_collision_box(struct entity *ent)
 {
     struct collision_box box;
     box.x_left = ent->position.x;
@@ -178,6 +224,8 @@ struct collision_box get_collision_box(struct entity *ent)
 Engine functions
 
 */
+
+void (*on_game_tick)(void);
 
 void game_init()
 {
@@ -203,8 +251,6 @@ void game_init()
     // Enable interrupts.
 	enable_interrupt();    
 }
-
-void (*on_game_tick)(void);
 
 void game_tick()
 {
@@ -245,13 +291,13 @@ void game_tick()
             ent->velocity.y = ent->velocity.y < 3 ? ent->velocity.y + 0.1 : 3;
 
             // Check if the entity is touching the ground.
-            if (get_collision_box(ent).y_bottom >= DISPLAY_HEIGHT)
+            if (get_entity_collision_box(ent).y_bottom >= DISPLAY_HEIGHT)
             {
                 ent->on_ground = true;
                 ent->position.y = DISPLAY_HEIGHT;
                 ent->velocity.y = 0;
             }
-            else if (get_collision_box(ent).y_bottom < 0)
+            else if (get_entity_collision_box(ent).y_bottom < 0)
             {
                 ent->position.y = 0;
                 ent->velocity.y = 0;
@@ -274,6 +320,24 @@ void game_draw()
     int i;
     for (i = 0; i < DRAW_LOOP; i++)
     {
+        if (i < MAX_GAME_OBJECTS) {
+            // Get the game object.
+            struct game_object *obj = &game_objects[i];
+
+            // Check if the game object is active.
+            if (obj->active)
+            {
+                if (obj->graphic != NULL)
+                {
+                    draw_graphic((int)(obj->position.x) - obj->width / 2, (int)(obj->position.y) - obj->height, obj->width, obj->height, obj->graphic);
+                }
+                else
+                {
+                    draw_rect((int)(obj->position.x) - obj->width / 2, (int)(obj->position.y) - obj->height, obj->width, obj->height);
+                }
+            }
+        }
+
         if (i < MAX_ENTITIES)
         {
             // Get the entity.
