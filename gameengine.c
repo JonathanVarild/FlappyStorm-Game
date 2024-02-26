@@ -55,8 +55,8 @@ struct label
 Object arrays
 */
 
-struct entity entities[MAX_ENTITIES] = {0};
-struct label labels[MAX_LABELS] = {0};
+extern struct entity entities[MAX_ENTITIES] = {0};
+extern struct label labels[MAX_LABELS] = {0};
 
 /*
 Creation functions
