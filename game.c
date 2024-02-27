@@ -11,6 +11,9 @@ double next_lightning;
 struct game_object *lower_pipe;
 struct game_object *upper_pipe;
 
+struct game_object *ground_1;
+struct game_object *ground_2;
+
 void(init_gamescene)();
 void(unload_gamescene)();
 void(update_gamescene)();
@@ -74,6 +77,18 @@ void update_gamescene()
     set_game_object_position(upper_pipe, (struct vector2D){upper_pipe->position.x - 0.1, upper_pipe->position.y});
     set_game_object_position(lower_pipe, (struct vector2D){lower_pipe->position.x - 0.1, lower_pipe->position.y});
 
+    set_game_object_position(ground_1, (struct vector2D){ground_1->position.x - 0.1, ground_1->position.y});
+    set_game_object_position(ground_2, (struct vector2D){ground_2->position.x - 0.1, ground_2->position.y});
+
+    if (ground_1->position.x <= -64)
+    {
+        set_game_object_position(ground_1, (struct vector2D){ground_1->position.x + ground_1->width * 2, 32});
+    }
+    else if (ground_2->position.x <= -64)
+    {
+        set_game_object_position(ground_2, (struct vector2D){ground_2->position.x + ground_2->width * 2, 32});
+    }
+
     get_score(score_text);
 
     if (score_label->text != score_text && !get_game_state()){
@@ -113,7 +128,14 @@ void init_gamescene()
 
     player = create_entity((struct vector2D){20, 20}, icon_bird_width, icon_bird_height);
     set_entity_graphic(player, icon_bird);
-    set_entity_velocity(player, (struct vector2D){10, 0});
+
+    ground_1 = create_game_object((struct vector2D){64, 32}, icon_ground_width, icon_ground_height);
+    ground_2 = create_game_object((struct vector2D){192, 32}, icon_ground_width, icon_ground_height);
+
+    set_game_object_graphic(ground_1, icon_ground);
+    set_game_object_graphic(ground_2, icon_ground);
+
+    game_set_ground_level(30);
 
     cloud = create_game_object((struct vector2D){-10, 20}, icon_cloud_width, icon_cloud_height);
     set_game_object_graphic(cloud, icon_cloud);
@@ -137,4 +159,6 @@ void unload_gamescene()
     remove_game_object(upper_pipe);
     remove_game_object(lower_pipe);
     remove_label(score_label);
+    remove_game_object(ground_1);
+    remove_game_object(ground_2);
 }
