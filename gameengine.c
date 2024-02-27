@@ -365,9 +365,9 @@ void game_tick()
                 ent->position.y = game_get_ground_level();
                 ent->velocity.y = 0;
             }
-            else if (get_entity_collision_box(ent).y_bottom < 0)
+            else if (get_entity_collision_box(ent).y_top < 0)
             {
-                ent->position.y = 0;
+                ent->position.y = ent->height;
                 ent->velocity.y = 0;
             }
         }
