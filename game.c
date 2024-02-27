@@ -11,32 +11,55 @@ double next_lightning;
 struct game_object *lower_pipe;
 struct game_object *upper_pipe;
 
-void jump()
-{
-    set_entity_velocity(player, (struct vector2D){player->velocity.x, -3});
-}
+void(init_gamescene)();
+void(unload_gamescene)();
+void(update_gamescene)();
 
-void go_left()
-{
-    set_entity_velocity(player, (struct vector2D){-5, player->velocity.y});
-}
-
-void go_right()
-{
-    set_entity_velocity(player, (struct vector2D){5, player->velocity.y});
-}
-
+int startTime;
 int score;
 char score_text[4];
 
 void get_score(char s[4])
 {
-    score = (int)(get_game_uptime());
+    score = (int)(get_game_uptime() - startTime);
 
     s[0] = '0' + (score / 100) % 10;
     s[1] = '0' + (score / 10) % 10;
     s[2] = '0' + (score / 1) % 10;
     s[3] = '\0';
+}
+
+void jump()
+{
+    if (get_game_state())
+    {
+
+        if (player->on_ground) {
+            set_label_text(score_label, "BTN4 to start", true);
+            unload_gamescene();
+            init_gamescene();
+        }
+        else {
+            set_game_state(false);
+        }
+
+    }
+    set_entity_velocity(player, (struct vector2D){player->velocity.x, -3});
+}
+
+void go_left()
+{
+    set_entity_velocity(player, (struct vector2D){-3, player->velocity.y});
+}
+
+void go_right()
+{
+    set_entity_velocity(player, (struct vector2D){3, player->velocity.y});
+}
+
+void game_over() {
+    set_label_text(score_label, "Game Over", true);
+    set_game_state(true);
 }
 
 void update_gamescene()
@@ -53,7 +76,7 @@ void update_gamescene()
 
     get_score(score_text);
 
-    if (score_label->text != score_text) {
+    if (score_label->text != score_text && !get_game_state()){
         set_label_text(score_label, score_text, true);
     }
 
@@ -70,13 +93,14 @@ void update_gamescene()
     }
 
     if (player->on_ground) {
-        set_label_text(score_label, "Game Over", true);
-        set_game_state(true);
+        game_over();
     }
 }
 
 void init_gamescene()
 {
+    startTime = get_game_uptime();
+
     button_4_click = jump;
 	button_3_click = go_left;
 	button_2_click = go_right;
@@ -85,9 +109,9 @@ void init_gamescene()
 
     next_lightning = get_game_uptime() + 5;
 
-    score_label = create_label("000", (struct vector2D){64, 0}, true, false);
+    score_label = create_label("BTN4 to Start", (struct vector2D){64, 0}, true, false);
 
-    player = create_entity((struct vector2D){0, 20}, icon_bird_width, icon_bird_height);
+    player = create_entity((struct vector2D){20, 20}, icon_bird_width, icon_bird_height);
     set_entity_graphic(player, icon_bird);
     set_entity_velocity(player, (struct vector2D){10, 0});
 
@@ -99,9 +123,18 @@ void init_gamescene()
 
     lower_pipe = create_game_object((struct vector2D){128, 35}, icon_pipe_lower_width, icon_pipe_lower_height);
     set_game_object_graphic(lower_pipe, icon_pipe_lower);
+
+    game_tick();
+    game_draw();
+
+    set_game_state(true);
 }
 
 void unload_gamescene()
 {
     remove_entity(player);
+    remove_game_object(cloud);
+    remove_game_object(upper_pipe);
+    remove_game_object(lower_pipe);
+    remove_label(score_label);
 }
