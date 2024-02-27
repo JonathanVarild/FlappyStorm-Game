@@ -143,6 +143,22 @@ void update_gamescene()
     if (player->on_ground) {
         game_over();
     }
+
+    struct collision_box player_box = get_entity_collision_box(player);
+    struct collision_box lower_pipe_box = get_game_object_collision_box(lower_pipe);
+    struct collision_box upper_pipe_box = get_game_object_collision_box(upper_pipe);
+
+    // Check if the player is colliding with the lower pipe.
+    if (player_box.x_right > lower_pipe_box.x_left && player_box.x_left < lower_pipe_box.x_right && player_box.y_bottom > lower_pipe_box.y_top)
+    {
+        game_over();
+    }
+
+    // Check if the player is colliding with the upper pipe.
+    if (player_box.x_right > upper_pipe_box.x_left && player_box.x_left < upper_pipe_box.x_right && player_box.y_top < upper_pipe_box.y_bottom)
+    {
+        game_over();
+    }
 }
 
 void init_gamescene()
