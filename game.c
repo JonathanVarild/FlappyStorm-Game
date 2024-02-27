@@ -9,18 +9,25 @@ struct entity *player;
 struct game_object *ground_1;
 struct game_object *ground_2;
 
-struct game_object *cloud;
-
-struct game_object *lightning;
+double next_obstacle;
 double next_lightning;
-
-struct game_object *lower_pipe;
-struct game_object *upper_pipe;
+struct game_object *obstacles[20] = {0};
+struct game_object *lightnings[20] = {0};
+int next_lightnings[20] = {0};
 
 // Give these functions a bigger scope.
 void(init_gamescene)();
 void(unload_gamescene)();
 void(update_gamescene)();
+
+// Create enumeration for obstacle types.
+enum obstacle_type
+{
+    PIPE,
+    CLOUD,
+    CLOUD_LIGHTNING,
+    LIGHTNING,
+};
 
 // Variables used in game scene.
 bool alive = true;
@@ -48,17 +55,18 @@ void jump()
     if (get_game_paused())
     {
         // Check if the player is on the ground.
-        if (!alive) {
+        if (!alive)
+        {
             // Reset the game scene.
             alive = true;
             unload_gamescene();
             init_gamescene();
         }
-        else {
+        else
+        {
             // Unpause the game.
             set_game_paused(false);
         }
-
     }
 
     // Make the bird fly.
@@ -78,27 +86,143 @@ void go_right()
 }
 
 // Function to end the game.
-void game_over() {
+void game_over()
+{
     set_label_text(score_label, "Game Over", true);
     set_game_paused(true);
     alive = false;
 }
 
+void generate_pipes()
+{
+    bool upper_pipe = true;
+    int i;
+    for (i = 0; i < 20; i++)
+    {
+        if (obstacles[i] == NULL || !obstacles[i]->active)
+        {
+            if (upper_pipe)
+            {
+                obstacles[i] = create_game_object((struct vector2D){128 + icon_pipe_upper_width, 7}, icon_pipe_upper_width, icon_pipe_upper_height);
+                set_game_object_graphic(obstacles[i], icon_pipe_upper);
+                set_game_object_type(obstacles[i], PIPE);
+                upper_pipe = false;
+            }
+            else
+            {
+                obstacles[i] = create_game_object((struct vector2D){128 + icon_pipe_lower_width, 35}, icon_pipe_lower_width, icon_pipe_lower_height);
+                set_game_object_graphic(obstacles[i], icon_pipe_lower);
+                set_game_object_type(obstacles[i], PIPE);
+                return;
+            }
+        }
+    }
+}
+
+void generate_cloud()
+{
+    int i;
+    for (i = 0; i < 20; i++)
+    {
+        if (obstacles[i] == NULL || !obstacles[i]->active)
+        {
+            obstacles[i] = create_game_object((struct vector2D){128 + icon_cloud_width, 10}, icon_cloud_width, icon_cloud_height);
+            set_game_object_graphic(obstacles[i], icon_cloud);
+            set_game_object_type(obstacles[i], CLOUD);
+
+            next_lightnings[i] = get_game_uptime() + 5;
+            return;
+        }
+    }
+}
+
 // Function to update the game scene. This function is called every game tick.
 void update_gamescene()
 {
-    // Move cloud to the right.
-    set_game_object_position(cloud, (struct vector2D){cloud->position.x + 0.2, cloud->position.y});
-    
-    // Update location of lightning if there is any.
-    if (lightning != NULL && lightning->active)
+    // Check if an obstacle should spawn.
+    if (next_obstacle < get_game_uptime())
     {
-        set_game_object_position(lightning, (struct vector2D){lightning->position.x + 0.2, lightning->position.y});
+        // Spawn the obstacle and set the next obstacle respawn.
+        next_obstacle = get_game_uptime() + 5;
+        
+        if ((int)(player->position.y) % 2 == 0)
+        {
+            generate_pipes();
+        }
+        else
+        {
+            generate_cloud();
+        }
     }
 
-    // Update location of pipes.
-    set_game_object_position(upper_pipe, (struct vector2D){upper_pipe->position.x - 0.2, upper_pipe->position.y});
-    set_game_object_position(lower_pipe, (struct vector2D){lower_pipe->position.x - 0.2, lower_pipe->position.y});
+    // Get the player coliision box.
+    struct collision_box player_box = get_entity_collision_box(player);
+
+    // Loop through all obstacles.
+    int i;
+    for (i = 0; i < 20; i++)
+    {
+        // Check if the obstacle is active.
+        if (obstacles[i] != NULL && obstacles[i]->active)
+        {
+            // Move the obstacle to the left.
+            set_game_object_position(obstacles[i], (struct vector2D){obstacles[i]->position.x - 0.2, obstacles[i]->position.y});
+
+            // Check if the player can collide with the obstacle.
+            if (obstacles[i]->type == PIPE || obstacles[i]->type == CLOUD_LIGHTNING || obstacles[i]->type == LIGHTNING)
+            {
+                // Get the collision box of the obstacle.
+                struct collision_box obstacle_box = get_game_object_collision_box(obstacles[i]);
+
+                // Check if the player is colliding with the obstacle.
+                if (player_box.x_right > obstacle_box.x_left && player_box.x_left < obstacle_box.x_right && player_box.y_bottom > obstacle_box.y_top && player_box.y_top < obstacle_box.y_bottom)
+                {
+                    game_over();
+                }
+            }
+
+            // Check if the entity is a active lightning cloud.
+            if (obstacles[i]->type == CLOUD_LIGHTNING && lightnings[i] != NULL && lightnings[i]->active)
+            {
+                set_game_object_position(lightnings[i], (struct vector2D){obstacles[i]->position.x + icon_lightning_width / 2, obstacles[i]->position.y + icon_lightning_height + 3});            
+            
+                if (lightnings[i]->age + 0.3 < get_game_uptime())
+                {
+                    remove_game_object(lightnings[i]);
+                    set_game_object_type(obstacles[i], CLOUD);
+                    lightnings[i] = NULL;
+                }
+            
+            }
+
+            // Check if the cloud should spawn a lightning.
+            if (obstacles[i]->type == CLOUD && next_lightnings[i] < get_game_uptime()) {
+                next_lightnings[i] = get_game_uptime() + 4;
+
+                lightnings[i] = create_game_object((struct vector2D){obstacles[i]->position.x + icon_lightning_width / 2, obstacles[i]->position.y + icon_lightning_height + 1}, icon_lightning_width, icon_lightning_height);
+                set_game_object_graphic(lightnings[i], icon_lightning);
+                set_game_object_type(lightnings[i], LIGHTNING);
+
+                set_game_object_type(obstacles[i], CLOUD_LIGHTNING);
+            }
+
+            // Check if the obstacle is off screen.
+            if (obstacles[i]->position.x < -obstacles[i]->width)
+            {
+                // Check if the object is an active lightning cloud.
+                if (obstacles[i]->type == CLOUD_LIGHTNING && lightnings[i] != NULL && lightnings[i]->active)
+                {
+                    // Remove the lightning.
+                    remove_game_object(lightnings[i]);
+                    lightnings[i] = NULL;
+                }
+
+                // Remove the object.
+                remove_game_object(obstacles[i]);
+                obstacles[i] = NULL;
+            }
+        }
+    }
 
     // Update location of ground.
     set_game_object_position(ground_1, (struct vector2D){ground_1->position.x - 0.2, ground_1->position.y});
@@ -118,47 +242,17 @@ void update_gamescene()
     get_score(score_text);
 
     // Update label if the score has changed.
-    if (score_label->text != score_text && !get_game_paused()){
+    if (score_label->text != score_text && !get_game_paused())
+    {
         set_label_text(score_label, score_text, true);
     }
 
-    // Check for the next lightning.
-    if (get_game_uptime() > next_lightning)
-    {
-        // Set the next lightning.
-        next_lightning = get_game_uptime() + 5;
-
-        // Create a new lightning.
-        lightning = create_game_object((struct vector2D){cloud->position.x + icon_lightning_width / 2, cloud->position.y + icon_lightning_height + 3}, icon_lightning_width, icon_lightning_height);
-        set_game_object_graphic(lightning, icon_lightning);
-    }
-
-    // Remove the lightning if its older than 0.3 seconds.
-    if (lightning != NULL && lightning->age + 0.3 < get_game_uptime())
-    {
-        remove_game_object(lightning);
-    }
-
     // Check if the player is on the ground.
-    if (player->on_ground) {
-        game_over();
-    }
-
-    struct collision_box player_box = get_entity_collision_box(player);
-    struct collision_box lower_pipe_box = get_game_object_collision_box(lower_pipe);
-    struct collision_box upper_pipe_box = get_game_object_collision_box(upper_pipe);
-
-    // Check if the player is colliding with the lower pipe.
-    if (player_box.x_right > lower_pipe_box.x_left && player_box.x_left < lower_pipe_box.x_right && player_box.y_bottom > lower_pipe_box.y_top)
+    if (player->on_ground)
     {
         game_over();
     }
 
-    // Check if the player is colliding with the upper pipe.
-    if (player_box.x_right > upper_pipe_box.x_left && player_box.x_left < upper_pipe_box.x_right && player_box.y_top < upper_pipe_box.y_bottom)
-    {
-        game_over();
-    }
 }
 
 void init_gamescene()
@@ -166,19 +260,22 @@ void init_gamescene()
     // Set the player as alive.
     alive = true;
 
+    // Pause the game.
+    set_game_paused(true);
+
     // Get the start time.
     startTime = get_game_uptime();
 
+    // Set the next obstacle spawn time.
+    next_obstacle = get_game_uptime();
+
     // Set engine functions for buttons.
     button_4_click = jump;
-	button_3_click = go_left;
-	button_2_click = go_right;
+    button_3_click = go_left;
+    button_2_click = go_right;
 
     // Set engine functions for game tick.
     on_game_tick = update_gamescene;
-
-    // Set the next lightning time.
-    next_lightning = get_game_uptime() + 5;
 
     // Create the score label.
     score_label = create_label("BTN4 to Start", (struct vector2D){64, 0}, true, false);
@@ -196,22 +293,9 @@ void init_gamescene()
     // Set the engine ground level.
     game_set_ground_level(30);
 
-    // Create the cloud.
-    cloud = create_game_object((struct vector2D){-10, 10}, icon_cloud_width, icon_cloud_height);
-    set_game_object_graphic(cloud, icon_cloud);
-
-    // Create the pipes.
-    upper_pipe = create_game_object((struct vector2D){128, 7}, icon_pipe_upper_width, icon_pipe_upper_height);
-    lower_pipe = create_game_object((struct vector2D){128, 35}, icon_pipe_lower_width, icon_pipe_lower_height);
-    set_game_object_graphic(upper_pipe, icon_pipe_upper);
-    set_game_object_graphic(lower_pipe, icon_pipe_lower);
-
     // Update the game state.
     game_tick();
     game_draw();
-
-    // Pause the game.
-    set_game_paused(true);
 }
 
 // Function to unload the game scene.
@@ -219,12 +303,29 @@ void unload_gamescene()
 {
     // Remove all game objects and entities.
     remove_entity(player);
-    remove_game_object(cloud);
-    remove_game_object(upper_pipe);
-    remove_game_object(lower_pipe);
     remove_label(score_label);
     remove_game_object(ground_1);
     remove_game_object(ground_2);
+
+    // Loop through all obstacles.
+    int i;
+    for (i = 0; i < 20; i++)
+    {
+        // Check if the obstacle is active.
+        if (obstacles[i] != NULL && obstacles[i]->active)
+        {
+            // Remove the obstacle.
+            remove_game_object(obstacles[i]);
+        }
+        if (lightnings[i] != NULL && lightnings[i]->active)
+        {
+            // Remove the lightning.
+            remove_game_object(lightnings[i]);
+        }
+
+        obstacles[i] = NULL;
+        lightnings[i] = NULL;
+    }
 
     // Set the engine functions to NULL.
     on_game_tick = NULL;
