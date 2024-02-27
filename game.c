@@ -6,6 +6,9 @@
 struct label *score_label;
 struct entity *player;
 
+struct game_object *ground_1;
+struct game_object *ground_2;
+
 struct game_object *cloud;
 
 struct game_object *lightning;
@@ -14,15 +17,13 @@ double next_lightning;
 struct game_object *lower_pipe;
 struct game_object *upper_pipe;
 
-struct game_object *ground_1;
-struct game_object *ground_2;
-
 // Give these functions a bigger scope.
 void(init_gamescene)();
 void(unload_gamescene)();
 void(update_gamescene)();
 
 // Variables used in game scene.
+bool alive = true;
 int startTime;
 int score;
 char score_text[4];
@@ -44,17 +45,18 @@ void get_score(char s[4])
 void jump()
 {
     // Check if the game is paused.
-    if (get_game_state())
+    if (get_game_paused())
     {
         // Check if the player is on the ground.
-        if (player->on_ground) {
+        if (!alive) {
             // Reset the game scene.
+            alive = true;
             unload_gamescene();
             init_gamescene();
         }
         else {
             // Unpause the game.
-            set_game_state(false);
+            set_game_paused(false);
         }
 
     }
@@ -78,7 +80,8 @@ void go_right()
 // Function to end the game.
 void game_over() {
     set_label_text(score_label, "Game Over", true);
-    set_game_state(true);
+    set_game_paused(true);
+    alive = false;
 }
 
 // Function to update the game scene. This function is called every game tick.
@@ -115,7 +118,7 @@ void update_gamescene()
     get_score(score_text);
 
     // Update label if the score has changed.
-    if (score_label->text != score_text && !get_game_state()){
+    if (score_label->text != score_text && !get_game_paused()){
         set_label_text(score_label, score_text, true);
     }
 
@@ -144,6 +147,9 @@ void update_gamescene()
 
 void init_gamescene()
 {
+    // Set the player as alive.
+    alive = true;
+
     // Get the start time.
     startTime = get_game_uptime();
 
@@ -189,7 +195,7 @@ void init_gamescene()
     game_draw();
 
     // Pause the game.
-    set_game_state(true);
+    set_game_paused(true);
 }
 
 // Function to unload the game scene.
