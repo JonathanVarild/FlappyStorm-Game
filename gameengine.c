@@ -263,12 +263,12 @@ void (*on_game_tick)(void);
 bool game_paused = false;
 int ground_level = 32;
 
-void set_game_state(bool paused)
+void set_game_paused(bool paused)
 {
     game_paused = paused;
 }
 
-bool get_game_state()
+bool get_game_paused()
 {
     return game_paused;
 }
