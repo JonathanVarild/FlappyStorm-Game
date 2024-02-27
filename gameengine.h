@@ -81,6 +81,8 @@ extern void (*on_game_tick)(void);
 
 void set_game_state(bool paused);
 bool get_game_state();
+void game_set_ground_level(int level);
+int game_get_ground_level();
 void game_init(void);
 void game_tick(void);
 void game_draw(void);

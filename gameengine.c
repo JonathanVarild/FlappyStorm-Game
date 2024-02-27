@@ -261,6 +261,7 @@ Engine functions
 
 void (*on_game_tick)(void);
 bool game_paused = false;
+int ground_level = 32;
 
 void set_game_state(bool paused)
 {
@@ -270,6 +271,16 @@ void set_game_state(bool paused)
 bool get_game_state()
 {
     return game_paused;
+}
+
+void game_set_ground_level(int level)
+{
+    ground_level = level;
+}
+
+int game_get_ground_level()
+{
+    return ground_level;
 }
 
 void game_init()
@@ -336,10 +347,10 @@ void game_tick()
             ent->velocity.y = ent->velocity.y < 3 ? ent->velocity.y + 0.1 : 3;
 
             // Check if the entity is touching the ground.
-            if (get_entity_collision_box(ent).y_bottom >= DISPLAY_HEIGHT)
+            if (get_entity_collision_box(ent).y_bottom >= game_get_ground_level())
             {
                 ent->on_ground = true;
-                ent->position.y = DISPLAY_HEIGHT;
+                ent->position.y = game_get_ground_level();
                 ent->velocity.y = 0;
             }
             else if (get_entity_collision_box(ent).y_bottom < 0)
@@ -350,7 +361,7 @@ void game_tick()
         }
 
         // CHeck if the entity is moving up or down.
-        if (ent->position.y < DISPLAY_HEIGHT)
+        if (ent->position.y < game_get_ground_level())
         {
             ent->on_ground = false;
         }
