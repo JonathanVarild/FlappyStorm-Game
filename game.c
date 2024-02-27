@@ -42,6 +42,12 @@ void get_score(char s[4])
 void update_gamescene()
 {
     set_game_object_position(cloud, (struct vector2D){cloud->position.x + 0.1, cloud->position.y});
+    
+    if (lightning != NULL && lightning->active)
+    {
+        set_game_object_position(lightning, (struct vector2D){lightning->position.x + 0.1, lightning->position.y});
+    }
+
     set_game_object_position(upper_pipe, (struct vector2D){upper_pipe->position.x - 0.1, upper_pipe->position.y});
     set_game_object_position(lower_pipe, (struct vector2D){lower_pipe->position.x - 0.1, lower_pipe->position.y});
 
@@ -79,7 +85,7 @@ void init_gamescene()
 
     next_lightning = get_game_uptime() + 5;
 
-    score_label = create_label("0000", (struct vector2D){64, 0}, true, false);
+    score_label = create_label("000", (struct vector2D){64, 0}, true, false);
 
     player = create_entity((struct vector2D){0, 20}, icon_bird_width, icon_bird_height);
     set_entity_graphic(player, icon_bird);
