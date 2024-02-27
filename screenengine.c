@@ -260,6 +260,7 @@ uint8_t text_font[94][8] = {
 void draw_text(int x, int y, char *text, bool selected) {
     // Declare variables.
     int i, j, k;
+    int char_index = 0;
 
     // Loop through the text.
     for (i = 0; text[i] != '\0'; i++) {
@@ -286,14 +287,16 @@ void draw_text(int x, int y, char *text, bool selected) {
 
                 // Check if the column/pixel should be drawn.
                 if (!selected && (char_data & (1 << k))) {
-                    draw_pixel(x + i * 8 + j, y + k);
+                    draw_pixel(x + char_index * 8 + j, y + k);
                 }
 
                 if (selected && !(char_data & (1 << k))) {
-                    draw_pixel(x + i * 8 + j, y + k);
+                    draw_pixel(x + char_index * 8 + j, y + k);
                 }
             }
         }
+
+        char_index++;
     }
 }
 
