@@ -67,18 +67,18 @@ void game_over() {
 
 void update_gamescene()
 {
-    set_game_object_position(cloud, (struct vector2D){cloud->position.x + 0.1, cloud->position.y});
+    set_game_object_position(cloud, (struct vector2D){cloud->position.x + 0.2, cloud->position.y});
     
     if (lightning != NULL && lightning->active)
     {
-        set_game_object_position(lightning, (struct vector2D){lightning->position.x + 0.1, lightning->position.y});
+        set_game_object_position(lightning, (struct vector2D){lightning->position.x + 0.2, lightning->position.y});
     }
 
-    set_game_object_position(upper_pipe, (struct vector2D){upper_pipe->position.x - 0.1, upper_pipe->position.y});
-    set_game_object_position(lower_pipe, (struct vector2D){lower_pipe->position.x - 0.1, lower_pipe->position.y});
+    set_game_object_position(upper_pipe, (struct vector2D){upper_pipe->position.x - 0.2, upper_pipe->position.y});
+    set_game_object_position(lower_pipe, (struct vector2D){lower_pipe->position.x - 0.2, lower_pipe->position.y});
 
-    set_game_object_position(ground_1, (struct vector2D){ground_1->position.x - 0.1, ground_1->position.y});
-    set_game_object_position(ground_2, (struct vector2D){ground_2->position.x - 0.1, ground_2->position.y});
+    set_game_object_position(ground_1, (struct vector2D){ground_1->position.x - 0.2, ground_1->position.y});
+    set_game_object_position(ground_2, (struct vector2D){ground_2->position.x - 0.2, ground_2->position.y});
 
     if (ground_1->position.x <= -64)
     {
@@ -137,7 +137,7 @@ void init_gamescene()
 
     game_set_ground_level(30);
 
-    cloud = create_game_object((struct vector2D){-10, 20}, icon_cloud_width, icon_cloud_height);
+    cloud = create_game_object((struct vector2D){-10, 10}, icon_cloud_width, icon_cloud_height);
     set_game_object_graphic(cloud, icon_cloud);
 
     upper_pipe = create_game_object((struct vector2D){128, 7}, icon_pipe_upper_width, icon_pipe_upper_height);

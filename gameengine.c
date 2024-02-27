@@ -297,7 +297,7 @@ void game_init()
     // Set up Timer 2 interrupt with a period of 0.005 seconds. (200 fps / ticks per second)
 	T2CON = 0x0;			// Stop any existing timer2 and clear control register
 	T2CONSET = 0x70;		// Set prescaler to 1:256
-	PR2 = 1562;			    // Set period register to ((0.01 * 80000000) / 256) = 1562
+	PR2 = 3125;			    // Set period register to ((0.02 * 40000000) / 256) = 3125
 	TMR2 = 0x0;				// Clear the timer register
 	IFSCLR(0) = 0x100;		// Clear the Timer 2 interrupt flag
 	IECSET(0) = 0x100;		// Enable Timer 2 interrupts
@@ -331,20 +331,20 @@ void game_tick()
         }
 
         // Update the position of the entity.
-        ent->position.x += ent->velocity.x * 0.1;
-        ent->position.y += ent->velocity.y * 0.1;
+        ent->position.x += ent->velocity.x * 0.15;
+        ent->position.y += ent->velocity.y * 0.15;
 
         // Check if x velocity isn't 0.
         if (ent->velocity.x != 0)
         {
-            ent->velocity.x = ent->on_ground ? ent->velocity.x * 0.94 : ent->velocity.x * 0.98;
+            ent->velocity.x = ent->on_ground ? ent->velocity.x * 0.92 : ent->velocity.x * 0.96;
         }
 
         // Check if the entity isn't on the ground.
         if (!ent->on_ground)
         {
             // Apply gravity.
-            ent->velocity.y = ent->velocity.y < 3 ? ent->velocity.y + 0.1 : 3;
+            ent->velocity.y = ent->velocity.y < 3 ? ent->velocity.y + 0.2 : 3;
 
             // Check if the entity is touching the ground.
             if (get_entity_collision_box(ent).y_bottom >= game_get_ground_level())
@@ -448,7 +448,7 @@ void user_isr(void)
 	{   
         if (!game_paused) {
             // Increment the game uptime.
-            game_uptime += 0.01;
+            game_uptime += 0.02;
 
             // Update the game.
             game_tick();
