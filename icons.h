@@ -19,11 +19,15 @@
 #define icon_star_width 11
 #define icon_star_height 11
 
+#define icon_ground_width 128
+#define icon_ground_height 2
+
 extern char icon_bird[16];
 extern char icon_cloud[18];
 extern char icon_lightning[7];
 extern char icon_pipe_lower[26];
 extern char icon_pipe_upper[26];
 extern char icon_star[22];
+extern char icon_ground[32];
 
 #endif
