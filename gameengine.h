@@ -30,6 +30,7 @@ struct game_object
     int width;
     int height;
     double age;
+    int type;
     uint8_t *graphic;
 };
 
@@ -42,6 +43,7 @@ struct entity
     int width;
     int height;
     double age;
+    int type;
     uint8_t *graphic;
 };
 
@@ -73,6 +75,8 @@ void set_game_object_graphic(struct game_object *obj, uint8_t *graphic);
 void set_entity_graphic(struct entity *ent, uint8_t *graphic);
 void set_label_selected(struct label *lbl, bool selected);
 void set_label_text(struct label *lbl, char *text, bool centered);
+void set_entity_type(struct entity *ent, int type);
+void set_game_object_type(struct game_object *obj, int type);
 
 struct collision_box get_game_object_collision_box(struct game_object *obj);
 struct collision_box get_entity_collision_box(struct entity *ent);

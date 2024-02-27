@@ -44,6 +44,7 @@ struct game_object
     int width;
     int height;
     double age;
+    int type;
     uint8_t *graphic;
 };
 
@@ -56,6 +57,7 @@ struct entity
     int width;
     int height;
     double age;
+    int type;
     uint8_t *graphic;
 };
 
@@ -229,6 +231,16 @@ void set_label_text(struct label *lbl, char *text, bool centered)
     else {
         lbl->x_offset = 0;
     }
+}
+
+void set_entity_type(struct entity *ent, int type)
+{
+    ent->type = type;
+}
+
+void set_game_object_type(struct game_object *obj, int type)
+{
+    obj->type = type;
 }
 
 /*
