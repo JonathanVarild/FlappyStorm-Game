@@ -306,8 +306,10 @@ void draw_graphic(int x, int y, int width, int height, uint8_t *graphic) {
     int index = 0;
     int line = 0;
 
-    width = width + (8 - width % 8);
-
+    if (width % 8 != 0) {
+        width = width + (8 - width % 8);
+    }
+    
     while (index < width * height) {
 
         if (data & (1 << (index % 8))) {
