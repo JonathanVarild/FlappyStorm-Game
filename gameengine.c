@@ -135,7 +135,7 @@ struct label *create_label(char *text, struct vector2D pos, bool centered, bool 
                 int j = 0;
                 while (text[j] != '\0')
                 {
-                    len += text[len] == ' ' ? 4 : 8;
+                    len += text[j] == ' ' ? 4 : 8;
                     j++;
                 }
             }
@@ -221,7 +221,7 @@ void set_label_text(struct label *lbl, char *text, bool centered)
         int j = 0;
         while (text[j] != '\0')
         {
-            len += text[len] == ' ' ? 4 : 8;
+            len += text[j] == ' ' ? 4 : 8;
             j++;
         }
         lbl->x_offset = len / 2;
