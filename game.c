@@ -188,24 +188,24 @@ void update_gamescene()
                 {
                     game_over();
                 }
-
-                // Check if the obstacle is a lightning cloud with an active lightning.
-                if (obstacles[i]->type == CLOUD_LIGHTNING && lightnings[i] != NULL && lightnings[i]->active)
-                {
-                    struct collision_box lightning_box = get_game_object_collision_box(lightnings[i]);
-
-                    if (player_box.x_right > lightning_box.x_left && player_box.x_left < lightning_box.x_right && player_box.y_bottom > lightning_box.y_top && player_box.y_top < lightning_box.y_bottom)
-                    {
-                        game_over();
-                    }
-                }
             }
 
             // Check if the entity is a active lightning cloud.
             if (obstacles[i]->type == CLOUD_LIGHTNING && lightnings[i] != NULL && lightnings[i]->active)
             {
+                // Set the position of the lightning.
                 set_game_object_position(lightnings[i], (struct vector2D){obstacles[i]->position.x + icon_lightning_width / 2, obstacles[i]->position.y + icon_lightning_height + 3});            
             
+                // Get the collision box of the player.
+                struct collision_box lightning_box = get_game_object_collision_box(lightnings[i]);
+
+                // Check if the player is colliding with the lightning.
+                if (player_box.x_right > lightning_box.x_left && player_box.x_left < lightning_box.x_right && player_box.y_bottom > lightning_box.y_top && player_box.y_top < lightning_box.y_bottom)
+                {
+                    game_over();
+                }
+
+                // Check if the lightning is old.
                 if (lightnings[i]->age + 0.3 < get_game_uptime())
                 {
                     remove_game_object(lightnings[i]);
