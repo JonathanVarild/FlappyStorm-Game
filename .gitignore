@@ -3,4 +3,4 @@
 outfile.elf
 outfile.hex
 *.o
-.vscode/settings.json
+.vscode*
