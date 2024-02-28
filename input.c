@@ -1,64 +1,65 @@
 #include "gameengine.h"
 #include <stdbool.h>
 #include "scenes.h"
+#include "player_manager.h"
 
 // Give these functions a bigger scope.
-void(init_inputscene)();
+void(init_inputscene)(int selected_player_ID);
 void(unload_inputscene)();
 void(update_inputscene)();
 
 static struct label *title;
 static struct label *menu_items[6];
 static int selected_item;
-
-static char name[5][2] = {" ", " ", " ", " ", " "};
-static char formatted_name[6];
+static int player_ID;
 
 static void select_item() {
 
     if (selected_item == 5) {
-        unload_inputscene();
-        init_gamescene();
-    } else {
-        if (name[selected_item][0] == ' ') {
-            name[selected_item][0] = 'A';
+
+        if (player_names[player_ID][0][0] == ' ') {
+            set_label_text(title, "No lead space!", true);
         }
         else {
-            name[selected_item][0] += 1;
+            format_name(player_ID);
+            unload_inputscene();
+            init_gamescene(player_ID);
         }
-        if (name[selected_item][0] > 'Z') {
-            name[selected_item][0] = ' ';
-        }
-        set_label_text(menu_items[selected_item], name[selected_item][0] == ' ' ? "-" : name[selected_item], false);
-    }
 
+    } else {
+        if (player_names[player_ID][selected_item][0] == ' ') {
+            player_names[player_ID][selected_item][0] = 'A';
+        }
+        else {
+            player_names[player_ID][selected_item][0] += 1;
+        }
+        if (player_names[player_ID][selected_item][0] > 'Z') {
+            player_names[player_ID][selected_item][0] = ' ';
+        }
+        set_label_text(menu_items[selected_item], player_names[player_ID][selected_item][0] == ' ' ? "-" : player_names[player_ID][selected_item], false);
+    }
 }
 
 static void go_left() {
     set_label_selected(menu_items[selected_item], false);
     selected_item = (selected_item + 5) % 6;
     set_label_selected(menu_items[selected_item], true);
+    set_label_text(title, "Enter your name:", true);
 }
 
 static void go_right() {
     set_label_selected(menu_items[selected_item], false);
     selected_item = (selected_item + 1) % 6;
     set_label_selected(menu_items[selected_item ], true);
+    set_label_text(title, "Enter your name:", true);
 }
 
-char* get_formatted_name() {
-    
-    int i;
-    for (i = 0; i < 5; i++) {
-        formatted_name[i] = name[i][0];
-    }
-    formatted_name[5] = '\0';
-    return formatted_name;
-
-}
-
-void init_inputscene()
+void init_inputscene(int selected_player_ID)
 {
+
+    // Set the player_ID.
+    player_ID = selected_player_ID;
+
     // Set engine functions for buttons.
     button_4_click = select_item;
     button_3_click = go_left;
