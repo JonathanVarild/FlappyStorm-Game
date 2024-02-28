@@ -8,8 +8,7 @@
 int main()
 {
 	game_init();
-
-	init_gamescene();
+	init_menuscene();
 
 	for (;;)
 		;
