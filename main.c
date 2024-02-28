@@ -3,7 +3,7 @@
 #include "utilities.h"
 #include <stdbool.h>
 #include <stdlib.h>
-#include "game.h"
+#include "scenes.h"
 
 int main()
 {
