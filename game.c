@@ -4,7 +4,8 @@
 #include "utilities.h"
 
 // Give entities/labels/game objects a bigger scope.
-struct label *score_label;
+struct label *top_label;
+struct label *middle_label;
 struct entity *player;
 
 struct game_object *ground;
@@ -39,6 +40,55 @@ int invincible_until = false;
 int startTime;
 int score;
 char score_text[4];
+
+// Function to remove all objects.
+void remove_all_objects()
+{
+    // Check if the player exists.
+    if (player != NULL && player->active)
+    {
+        // Remove the player.
+        remove_entity(player);
+    }
+
+    // Loop through all obstacles.
+    int i;
+    for (i = 0; i < 20; i++)
+    {
+        // Check if the obstacle is active.
+        if (obstacles[i] != NULL && obstacles[i]->active)
+        {
+            // Remove the obstacle.
+            remove_game_object(obstacles[i]);
+        }
+
+        // Check if the lightning is active.
+        if (lightnings[i] != NULL && lightnings[i]->active)
+        {
+            // Remove the lightning.
+            remove_game_object(lightnings[i]);
+        }
+
+        // Check if the rain drop is active.
+        if (rain_drops[i] != NULL && rain_drops[i]->active)
+        {
+            // Remove the rain drop.
+            remove_entity(rain_drops[i]);
+        }
+
+        // Check if the powerup is active.
+        if (powerups[i] != NULL && powerups[i]->active)
+        {
+            // Remove the powerup.
+            remove_game_object(powerups[i]);
+        }
+
+        obstacles[i] = NULL;
+        lightnings[i] = NULL;
+        rain_drops[i] = NULL;
+        powerups[i] = NULL;
+    }
+}
 
 // Function to get the current score.
 void get_score(char s[4])
@@ -98,10 +148,21 @@ void go_right()
 // Function to end the game.
 void game_over()
 {
+    // Check if the player is invincible.
     if (invincible_until > get_game_uptime()) {
         return;
     }
-    set_label_text(score_label, "Game Over", true);
+
+    // Remove all objects.
+    remove_all_objects();
+
+    // Set the top label to game over.
+    set_label_text(top_label, "Game Over", true);
+
+    // Create the middle label.
+    middle_label = create_label(score_text, (struct vector2D){64, 16}, true, false);
+
+    // Stop the game.
     set_game_paused(true);
     alive = false;
 }
@@ -344,11 +405,11 @@ void update_gamescene()
 
     // Update label if the score has changed.
     if (invincible_until > get_game_uptime()) {
-        set_label_text(score_label, "INVINCIBLE", true);
+        set_label_text(top_label, "INVINCIBLE", true);
     }
-    else if (score_label->text != score_text && !get_game_paused())
+    else if (top_label->text != score_text && !get_game_paused())
     {
-        set_label_text(score_label, score_text, true);
+        set_label_text(top_label, score_text, true);
     }
 
     // Check if the player is invincible.
@@ -402,7 +463,7 @@ void init_gamescene()
     on_game_tick = update_gamescene;
 
     // Create the score label.
-    score_label = create_label("BTN4 to Start", (struct vector2D){64, 0}, true, false);
+    top_label = create_label("BTN4 to Start", (struct vector2D){64, 0}, true, false);
 
     // Create the player.
     player = create_entity((struct vector2D){20, 20}, icon_bird_width, icon_bird_height);
@@ -424,47 +485,18 @@ void init_gamescene()
 void unload_gamescene()
 {
     // Remove all game objects and entities.
-    remove_entity(player);
-    remove_label(score_label);
+    remove_label(top_label);
     remove_game_object(ground);
 
-    // Loop through all obstacles.
-    int i;
-    for (i = 0; i < 20; i++)
+    // Check if the middle label exists.
+    if (middle_label != NULL && middle_label->active)
     {
-        // Check if the obstacle is active.
-        if (obstacles[i] != NULL && obstacles[i]->active)
-        {
-            // Remove the obstacle.
-            remove_game_object(obstacles[i]);
-        }
-
-        // Check if the lightning is active.
-        if (lightnings[i] != NULL && lightnings[i]->active)
-        {
-            // Remove the lightning.
-            remove_game_object(lightnings[i]);
-        }
-
-        // Check if the rain drop is active.
-        if (rain_drops[i] != NULL && rain_drops[i]->active)
-        {
-            // Remove the rain drop.
-            remove_entity(rain_drops[i]);
-        }
-
-        // Check if the powerup is active.
-        if (powerups[i] != NULL && powerups[i]->active)
-        {
-            // Remove the powerup.
-            remove_game_object(powerups[i]);
-        }
-
-        obstacles[i] = NULL;
-        lightnings[i] = NULL;
-        rain_drops[i] = NULL;
-        powerups[i] = NULL;
+        // Remove the middle label.
+        remove_label(middle_label);
     }
+
+    // Remove all objects.
+    remove_all_objects();
 
     // Set the engine functions to NULL.
     on_game_tick = NULL;
