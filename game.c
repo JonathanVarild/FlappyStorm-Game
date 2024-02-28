@@ -1,6 +1,7 @@
 #include "gameengine.h"
 #include <stdbool.h>
 #include "icons.h"
+#include "utilities.h"
 
 // Give entities/labels/game objects a bigger scope.
 struct label *score_label;
@@ -69,6 +70,9 @@ void jump()
         }
     }
 
+    // Update random seed.
+    set_random_seed(get_game_uptime() * 100 * (player->position.x + player->position.y + player->velocity.x + player->velocity.y));
+
     // Make the bird fly.
     set_entity_velocity(player, (struct vector2D){player->velocity.x, -3});
 }
@@ -76,12 +80,14 @@ void jump()
 // Function to move the player left.
 void go_left()
 {
+    set_random_seed(get_game_uptime() * 100 * (player->position.x + player->position.y + player->velocity.x + player->velocity.y));
     set_entity_velocity(player, (struct vector2D){-3, player->velocity.y});
 }
 
 // Function to move the player right.
 void go_right()
 {
+    set_random_seed(get_game_uptime() * 100 * (player->position.x + player->position.y + player->velocity.x + player->velocity.y));
     set_entity_velocity(player, (struct vector2D){3, player->velocity.y});
 }
 
@@ -95,6 +101,7 @@ void game_over()
 
 void generate_pipes()
 {
+    int y_offset = get_random_int(-2, 2);
     bool upper_pipe = true;
     int i;
     for (i = 0; i < 20; i++)
@@ -103,14 +110,14 @@ void generate_pipes()
         {
             if (upper_pipe)
             {
-                obstacles[i] = create_game_object((struct vector2D){128 + icon_pipe_upper_width, 7}, icon_pipe_upper_width, icon_pipe_upper_height);
+                obstacles[i] = create_game_object((struct vector2D){128 + icon_pipe_upper_width, 7 + y_offset}, icon_pipe_upper_width, icon_pipe_upper_height);
                 set_game_object_graphic(obstacles[i], icon_pipe_upper);
                 set_game_object_type(obstacles[i], PIPE);
                 upper_pipe = false;
             }
             else
             {
-                obstacles[i] = create_game_object((struct vector2D){128 + icon_pipe_lower_width, 35}, icon_pipe_lower_width, icon_pipe_lower_height);
+                obstacles[i] = create_game_object((struct vector2D){128 + icon_pipe_lower_width, 35 + y_offset}, icon_pipe_lower_width, icon_pipe_lower_height);
                 set_game_object_graphic(obstacles[i], icon_pipe_lower);
                 set_game_object_type(obstacles[i], PIPE);
                 return;
@@ -126,7 +133,9 @@ void generate_cloud()
     {
         if (obstacles[i] == NULL || !obstacles[i]->active)
         {
-            obstacles[i] = create_game_object((struct vector2D){128 + icon_cloud_width, 10}, icon_cloud_width, icon_cloud_height);
+            int y_offset = get_random_int(-3, 4);
+
+            obstacles[i] = create_game_object((struct vector2D){128 + icon_cloud_width, 10 + y_offset}, icon_cloud_width, icon_cloud_height);
             set_game_object_graphic(obstacles[i], icon_cloud);
             set_game_object_type(obstacles[i], CLOUD);
 
@@ -145,7 +154,7 @@ void update_gamescene()
         // Spawn the obstacle and set the next obstacle respawn.
         next_obstacle = get_game_uptime() + 5;
         
-        if ((int)(player->position.y) % 2 == 0)
+        if (get_random_int(0,10) > 3)
         {
             generate_pipes();
         }
@@ -169,7 +178,7 @@ void update_gamescene()
             set_game_object_position(obstacles[i], (struct vector2D){obstacles[i]->position.x - 0.2, obstacles[i]->position.y});
 
             // Check if the player can collide with the obstacle.
-            if (obstacles[i]->type == PIPE || obstacles[i]->type == CLOUD_LIGHTNING || obstacles[i]->type == LIGHTNING)
+            if (obstacles[i]->type == PIPE || obstacles[i]->type == CLOUD_LIGHTNING)
             {
                 // Get the collision box of the obstacle.
                 struct collision_box obstacle_box = get_game_object_collision_box(obstacles[i]);
@@ -178,6 +187,17 @@ void update_gamescene()
                 if (player_box.x_right > obstacle_box.x_left && player_box.x_left < obstacle_box.x_right && player_box.y_bottom > obstacle_box.y_top && player_box.y_top < obstacle_box.y_bottom)
                 {
                     game_over();
+                }
+
+                // Check if the obstacle is a lightning cloud with an active lightning.
+                if (obstacles[i]->type == CLOUD_LIGHTNING && lightnings[i] != NULL && lightnings[i]->active)
+                {
+                    struct collision_box lightning_box = get_game_object_collision_box(lightnings[i]);
+
+                    if (player_box.x_right > lightning_box.x_left && player_box.x_left < lightning_box.x_right && player_box.y_bottom > lightning_box.y_top && player_box.y_top < lightning_box.y_bottom)
+                    {
+                        game_over();
+                    }
                 }
             }
 
@@ -257,6 +277,9 @@ void update_gamescene()
 
 void init_gamescene()
 {
+    // Update random seed.
+    set_random_seed((unsigned long)(get_game_uptime() * 100));
+
     // Set the player as alive.
     alive = true;
 
