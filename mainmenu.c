@@ -17,7 +17,7 @@ static void select_item() {
     if (selected_item == 0) {
         // Open name selection scene.
         unload_menuscene();
-        init_inputscene();
+        init_playerscene();
     } else if (selected_item == 1) {
         // Leaderboard
     }
