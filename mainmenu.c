@@ -3,18 +3,18 @@
 #include "icons.h"
 #include "utilities.h"
 
-struct label *title;
-struct label *menu_items[2];
+static struct label *title;
+static struct label *menu_items[2];
 
-int selected_item;
-double title_y;
+static int selected_item;
+static double title_y;
 
 // Give these functions a bigger scope.
 void(init_menuscene)();
 void(unload_menuscene)();
 void(update_menuscene)();
 
-void select_item() {
+static void select_item() {
     if (selected_item == 0) {
         // Start game
         unload_menuscene();
@@ -25,7 +25,7 @@ void select_item() {
 
 }
 
-void change_item() {
+static void change_item() {
     selected_item = (selected_item + 1) % 2;
 
     int i;
@@ -56,6 +56,7 @@ void init_menuscene()
     // Set engine functions for buttons.
     button_4_click = select_item;
     button_3_click = change_item;
+    button_2_click = change_item;
 
     on_game_tick = update_menuscene;
 
@@ -69,6 +70,12 @@ void init_menuscene()
 // Function to unload the game scene.
 void unload_menuscene()
 {
+    button_4_click = NULL;
+    button_3_click = NULL;
+    button_2_click = NULL;
+
+    on_game_tick = NULL;
+
     // Remove the title label.
     remove_label(title);
     int i;
