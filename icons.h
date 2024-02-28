@@ -19,7 +19,7 @@
 #define icon_star_width 11
 #define icon_star_height 11
 
-#define icon_ground_width 128
+#define icon_ground_width 256
 #define icon_ground_height 2
 
 extern char icon_bird[16];
