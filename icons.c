@@ -4,6 +4,9 @@
 #define icon_cloud_width 15
 #define icon_cloud_height 9
 
+#define icon_lightningcloud_width 15
+#define icon_lightningcloud_height 9
+
 #define icon_lightning_width 3
 #define icon_lightning_height 7
 
@@ -55,6 +58,27 @@ char icon_cloud[] = {
     0x40,
     0x01,
     0x40,
+    0xFE,
+    0x3F,
+};
+
+char icon_lightningcloud[] = {
+    0x80,
+    0x03,
+    0x40,
+    0x06,
+    0x70,
+    0x0A,
+    0x88,
+    0x1D,
+    0xAE,
+    0x20,
+    0x59,
+    0x56,
+    0x49,
+    0x50,
+    0x85,
+    0x53,
     0xFE,
     0x3F,
 };

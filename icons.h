@@ -7,6 +7,9 @@
 #define icon_cloud_width 15
 #define icon_cloud_height 9
 
+#define icon_lightningcloud_width 15
+#define icon_lightningcloud_height 9
+
 #define icon_lightning_width 3
 #define icon_lightning_height 7
 
@@ -22,12 +25,13 @@
 #define icon_ground_width 256
 #define icon_ground_height 2
 
-extern char icon_bird[16];
-extern char icon_cloud[18];
-extern char icon_lightning[7];
-extern char icon_pipe_lower[26];
-extern char icon_pipe_upper[26];
-extern char icon_star[22];
-extern char icon_ground[32];
+extern char icon_bird[];
+extern char icon_cloud[];
+extern char icon_lightningcloud[];
+extern char icon_lightning[];
+extern char icon_pipe_lower[];
+extern char icon_pipe_upper[];
+extern char icon_star[];
+extern char icon_ground[];
 
 #endif
