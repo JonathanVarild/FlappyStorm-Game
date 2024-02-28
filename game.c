@@ -252,6 +252,7 @@ void update_gamescene()
                 {
                     remove_game_object(lightnings[i]);
                     set_game_object_type(obstacles[i], CLOUD);
+                    set_game_object_graphic(obstacles[i], icon_cloud);
                     lightnings[i] = NULL;
                 }
             }
@@ -266,6 +267,7 @@ void update_gamescene()
                 set_game_object_type(lightnings[i], LIGHTNING);
 
                 set_game_object_type(obstacles[i], CLOUD_LIGHTNING);
+                set_game_object_graphic(obstacles[i], icon_lightningcloud);
             }
 
             // Check if the cloud should spawn a rain drop.
