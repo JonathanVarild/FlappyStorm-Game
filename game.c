@@ -2,6 +2,8 @@
 #include <stdbool.h>
 #include "icons.h"
 #include "utilities.h"
+#include "scenes.h"
+#include "player_manager.h"
 
 // Give entities/labels/game objects a bigger scope.
 struct label *top_label;
@@ -21,7 +23,7 @@ int next_lightnings[20] = {0};
 int next_rain_drops[20] = {0};
 
 // Give these functions a bigger scope.
-void(init_gamescene)();
+void(init_gamescene)(int player_ID);
 void(unload_gamescene)();
 void(update_gamescene)();
 
@@ -40,6 +42,7 @@ int invincible_until = false;
 int startTime;
 int score;
 char score_text[4];
+int player_ID;
 
 // Function to remove all objects.
 void remove_all_objects()
@@ -115,7 +118,7 @@ void jump()
             // Reset the game scene.
             alive = true;
             unload_gamescene();
-            init_gamescene();
+            init_gamescene(player_ID);
         }
         else
         {
@@ -134,30 +137,62 @@ void jump()
 // Function to move the player left.
 void go_left()
 {
-    set_random_seed(get_game_uptime() * 100 * (player->position.x + player->position.y + player->velocity.x + player->velocity.y));
-    set_entity_velocity(player, (struct vector2D){-3, player->velocity.y});
+    // Check if the game is paused.
+    if (get_game_paused())
+    {
+        unload_gamescene();
+        init_menuscene();
+    }
+    else
+    {
+        set_random_seed(get_game_uptime() * 100 * (player->position.x + player->position.y + player->velocity.x + player->velocity.y));
+        set_entity_velocity(player, (struct vector2D){-3, player->velocity.y});
+    }
 }
 
 // Function to move the player right.
 void go_right()
 {
-    set_random_seed(get_game_uptime() * 100 * (player->position.x + player->position.y + player->velocity.x + player->velocity.y));
-    set_entity_velocity(player, (struct vector2D){3, player->velocity.y});
+    // Check if the game is paused.
+    if (get_game_paused())
+    {
+        unload_gamescene();
+        init_menuscene();
+    }
+    else
+    {
+        set_random_seed(get_game_uptime() * 100 * (player->position.x + player->position.y + player->velocity.x + player->velocity.y));
+        set_entity_velocity(player, (struct vector2D){3, player->velocity.y});
+    }
 }
 
 // Function to end the game.
 void game_over()
 {
     // Check if the player is invincible.
-    if (invincible_until > get_game_uptime()) {
+    if (invincible_until > get_game_uptime())
+    {
         return;
     }
 
     // Remove all objects.
     remove_all_objects();
 
-    // Set the top label to game over.
-    set_label_text(top_label, "Game Over", true);
+    // Check if the player has a new high score.
+    if (score > highscores[player_ID])
+    {
+        // Set the high score.
+        set_highscore(player_ID, score);
+
+        // Create the middle label.
+        set_label_text(top_label, "New Highscore", true);
+    }
+    else {
+
+        // Set the top label to game over.
+        set_label_text(top_label, "Game Over", true);
+
+    }
 
     // Create the middle label.
     middle_label = create_label(score_text, (struct vector2D){64, 16}, true, false);
@@ -234,7 +269,7 @@ void generate_powerup()
     {
         if (powerups[i] == NULL || !powerups[i]->active)
         {
-            powerups[i] = create_game_object((struct vector2D){128 + icon_star_width, get_random_int(icon_star_height,32)}, icon_star_width, icon_star_height);
+            powerups[i] = create_game_object((struct vector2D){128 + icon_star_width, get_random_int(icon_star_height, 32)}, icon_star_width, icon_star_height);
             set_game_object_graphic(powerups[i], icon_star);
             return;
         }
@@ -355,7 +390,7 @@ void update_gamescene()
                 obstacles[i] = NULL;
             }
         }
-   
+
         // Check if the powerup is active.
         if (powerups[i] != NULL && powerups[i]->active)
         {
@@ -371,10 +406,9 @@ void update_gamescene()
                 remove_game_object(powerups[i]);
                 powerups[i] = NULL;
                 invincible_until = get_game_uptime() + 10;
-                
             }
         }
-    
+
         // Check if the rain drop is active.
         if (rain_drops[i] != NULL && rain_drops[i]->active)
         {
@@ -404,7 +438,8 @@ void update_gamescene()
     get_score(score_text);
 
     // Update label if the score has changed.
-    if (invincible_until > get_game_uptime()) {
+    if (invincible_until > get_game_uptime())
+    {
         set_label_text(top_label, "INVINCIBLE", true);
     }
     else if (top_label->text != score_text && !get_game_paused())
@@ -413,10 +448,12 @@ void update_gamescene()
     }
 
     // Check if the player is invincible.
-    if (invincible_until > get_game_uptime()) {
+    if (invincible_until > get_game_uptime())
+    {
         set_entity_visibility(player, (int)(get_game_uptime() * 10) % 2);
     }
-    else {
+    else
+    {
         set_entity_visibility(player, true);
     }
 
@@ -434,8 +471,11 @@ void update_gamescene()
     }
 }
 
-void init_gamescene()
+void init_gamescene(int player_ID)
 {
+    // Set the player.
+    player_ID = player_ID;
+
     // Update random seed.
     set_random_seed((unsigned long)(get_game_uptime() * 100));
 
@@ -506,4 +546,7 @@ void unload_gamescene()
 
     // Set the ground level.
     game_set_ground_level(0);
+
+    // Resume the game.
+    set_game_paused(false);
 }
