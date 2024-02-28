@@ -212,12 +212,11 @@ void update_gamescene()
                     set_game_object_type(obstacles[i], CLOUD);
                     lightnings[i] = NULL;
                 }
-            
             }
 
             // Check if the cloud should spawn a lightning.
             if (obstacles[i]->type == CLOUD && next_lightnings[i] < get_game_uptime()) {
-                next_lightnings[i] = get_game_uptime() + 4;
+                next_lightnings[i] = get_game_uptime() + 2 + get_random_int(0, 2);
 
                 lightnings[i] = create_game_object((struct vector2D){obstacles[i]->position.x + icon_lightning_width / 2, obstacles[i]->position.y + icon_lightning_height + 1}, icon_lightning_width, icon_lightning_height);
                 set_game_object_graphic(lightnings[i], icon_lightning);
