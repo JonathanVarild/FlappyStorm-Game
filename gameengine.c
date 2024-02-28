@@ -40,6 +40,7 @@ struct collision_box
 struct game_object
 {
     bool active;
+    bool is_visible;
     struct vector2D position;
     int width;
     int height;
@@ -51,6 +52,7 @@ struct game_object
 struct entity
 {
     bool active;
+    bool is_visible;
     struct vector2D position;
     struct vector2D velocity;
     bool on_ground;
@@ -91,6 +93,7 @@ struct game_object *create_game_object(struct vector2D pos, int width, int heigh
         if (!game_objects[i].active)
         {
             game_objects[i].active = true;
+            game_objects[i].is_visible = true;
             game_objects[i].position = pos;
             game_objects[i].width = width;
             game_objects[i].height = height;
@@ -110,6 +113,7 @@ struct entity *create_entity(struct vector2D pos, int width, int height)
         if (!entities[i].active)
         {
             entities[i].active = true;
+            game_objects[i].is_visible = true;
             entities[i].position = pos;
             entities[i].velocity.x = 0;
             entities[i].velocity.y = 0;
@@ -241,6 +245,16 @@ void set_entity_type(struct entity *ent, int type)
 void set_game_object_type(struct game_object *obj, int type)
 {
     obj->type = type;
+}
+
+void set_entity_visibility(struct entity *ent, bool visible)
+{
+    ent->is_visible = visible;
+}
+
+void set_game_object_visibility(struct game_object *obj, bool visible)
+{
+    obj->is_visible = visible;
 }
 
 /*
@@ -393,7 +407,7 @@ void game_draw()
             struct game_object *obj = &game_objects[i];
 
             // Check if the game object is active.
-            if (obj->active)
+            if (obj->active && obj->is_visible)
             {
                 if (obj->graphic != NULL)
                 {
@@ -412,7 +426,7 @@ void game_draw()
             struct entity *ent = &entities[i];
 
             // Check if the entity is active.
-            if (ent->active)
+            if (ent->active && ent->is_visible)
             {
                 if (ent->graphic != NULL)
                 {

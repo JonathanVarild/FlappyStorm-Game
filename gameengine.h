@@ -26,6 +26,7 @@ struct collision_box {
 struct game_object
 {
     bool active;
+    bool is_visible;
     struct vector2D position;
     int width;
     int height;
@@ -37,6 +38,7 @@ struct game_object
 struct entity
 {
     bool active;
+    bool is_visible;
     struct vector2D position;
     struct vector2D velocity;
     bool on_ground;
@@ -77,6 +79,8 @@ void set_label_selected(struct label *lbl, bool selected);
 void set_label_text(struct label *lbl, char *text, bool centered);
 void set_entity_type(struct entity *ent, int type);
 void set_game_object_type(struct game_object *obj, int type);
+void set_entity_visibility(struct entity *ent, bool visible);
+void set_game_object_visibility(struct game_object *obj, bool visible);
 
 struct collision_box get_game_object_collision_box(struct game_object *obj);
 struct collision_box get_entity_collision_box(struct entity *ent);
