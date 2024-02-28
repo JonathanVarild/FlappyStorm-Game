@@ -7,8 +7,7 @@
 struct label *score_label;
 struct entity *player;
 
-struct game_object *ground_1;
-struct game_object *ground_2;
+struct game_object *ground;
 
 double next_obstacle;
 double next_lightning;
@@ -287,17 +286,12 @@ void update_gamescene()
     }
 
     // Update location of ground.
-    set_game_object_position(ground_1, (struct vector2D){ground_1->position.x - 0.2, ground_1->position.y});
-    set_game_object_position(ground_2, (struct vector2D){ground_2->position.x - 0.2, ground_2->position.y});
+    set_game_object_position(ground, (struct vector2D){ground->position.x - 0.2, ground->position.y});
 
     // Update location of ground if it goes off screen.
-    if (ground_1->position.x <= -64)
+    if (ground->position.x <= 0)
     {
-        set_game_object_position(ground_1, (struct vector2D){ground_1->position.x + ground_1->width * 2, 32});
-    }
-    else if (ground_2->position.x <= -64)
-    {
-        set_game_object_position(ground_2, (struct vector2D){ground_2->position.x + ground_2->width * 2, 32});
+        set_game_object_position(ground, (struct vector2D){ground->position.x + ground->width / 2, 32});
     }
 
     // Get the current score.
@@ -356,10 +350,8 @@ void init_gamescene()
     set_entity_graphic(player, icon_bird);
 
     // Create the ground.
-    ground_1 = create_game_object((struct vector2D){64, 32}, icon_ground_width, icon_ground_height);
-    ground_2 = create_game_object((struct vector2D){192, 32}, icon_ground_width, icon_ground_height);
-    set_game_object_graphic(ground_1, icon_ground);
-    set_game_object_graphic(ground_2, icon_ground);
+    ground = create_game_object((struct vector2D){128, 32}, icon_ground_width, icon_ground_height);
+    set_game_object_graphic(ground, icon_ground);
 
     // Set the engine ground level.
     game_set_ground_level(30);
@@ -375,8 +367,7 @@ void unload_gamescene()
     // Remove all game objects and entities.
     remove_entity(player);
     remove_label(score_label);
-    remove_game_object(ground_1);
-    remove_game_object(ground_2);
+    remove_game_object(ground);
 
     // Loop through all obstacles.
     int i;
