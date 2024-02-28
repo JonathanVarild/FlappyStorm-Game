@@ -14,7 +14,10 @@ double next_obstacle;
 double next_lightning;
 struct game_object *obstacles[20] = {0};
 struct game_object *lightnings[20] = {0};
+struct entity *rain_drops[20] = {0};
+
 int next_lightnings[20] = {0};
+int next_rain_drops[20] = {0};
 
 // Give these functions a bigger scope.
 void(init_gamescene)();
@@ -99,6 +102,19 @@ void game_over()
     alive = false;
 }
 
+void generate_rain_drop(struct vector2D pos)
+{
+    int i;
+    for (i = 0; i < 20; i++)
+    {
+        if (rain_drops[i] == NULL || !rain_drops[i]->active)
+        {
+            rain_drops[i] = create_entity(pos, 1, 1);
+            return;
+        }
+    }
+}
+
 void generate_pipes()
 {
     int y_offset = get_random_int(-2, 2);
@@ -133,13 +149,14 @@ void generate_cloud()
     {
         if (obstacles[i] == NULL || !obstacles[i]->active)
         {
-            int y_offset = get_random_int(-3, 4);
+            int y_offset = get_random_int(-2, 4);
 
             obstacles[i] = create_game_object((struct vector2D){128 + icon_cloud_width, 10 + y_offset}, icon_cloud_width, icon_cloud_height);
             set_game_object_graphic(obstacles[i], icon_cloud);
             set_game_object_type(obstacles[i], CLOUD);
 
             next_lightnings[i] = get_game_uptime() + 5;
+            next_rain_drops[i] = get_game_uptime() + 1;
             return;
         }
     }
@@ -225,6 +242,13 @@ void update_gamescene()
                 set_game_object_type(obstacles[i], CLOUD_LIGHTNING);
             }
 
+            // Check if the cloud should spawn a rain drop.
+            if (obstacles[i]->type == CLOUD && next_rain_drops[i] < get_game_uptime()) {
+                next_rain_drops[i] = get_game_uptime() + 0.5 + get_random_int(1, 2);
+
+                generate_rain_drop((struct vector2D){obstacles[i]->position.x + get_random_int(-icon_cloud_width / 2, icon_cloud_width / 2), obstacles[i]->position.y});
+            }
+
             // Check if the obstacle is off screen.
             if (obstacles[i]->position.x < -obstacles[i]->width)
             {
@@ -239,6 +263,25 @@ void update_gamescene()
                 // Remove the object.
                 remove_game_object(obstacles[i]);
                 obstacles[i] = NULL;
+            }
+        }
+    }
+
+    // Loop through all rain drops.
+    for (i = 0; i < 20; i++)
+    {
+        // Check if the rain drop is active.
+        if (rain_drops[i] != NULL && rain_drops[i]->active)
+        {
+            // Move the rain drop.
+            set_entity_position(rain_drops[i], (struct vector2D){rain_drops[i]->position.x - 0.2, rain_drops[i]->position.y});
+
+            // Check if the rain drop is off screen.
+            if (rain_drops[i]->on_ground)
+            {
+                // Remove the rain drop.
+                remove_entity(rain_drops[i]);
+                rain_drops[i] = NULL;
             }
         }
     }
