@@ -113,7 +113,7 @@ struct entity *create_entity(struct vector2D pos, int width, int height)
         if (!entities[i].active)
         {
             entities[i].active = true;
-            game_objects[i].is_visible = true;
+            entities[i].is_visible = true;
             entities[i].position = pos;
             entities[i].velocity.x = 0;
             entities[i].velocity.y = 0;
