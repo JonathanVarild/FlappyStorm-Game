@@ -273,6 +273,12 @@ void update_gamescene()
         game_over();
     }
 
+    // Check if the player is colliding with the world edges.
+    if (player->position.x < 0 || player->position.x > 128)
+    {
+        set_entity_velocity(player, (struct vector2D){0, player->velocity.y});
+        set_entity_position(player, (struct vector2D){player->position.x < 0 ? 0 : 128, player->position.y});
+    }
 }
 
 void init_gamescene()
