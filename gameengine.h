@@ -7,7 +7,7 @@
 
 #define MAX_GAME_OBJECTS 32
 #define MAX_ENTITIES 32
-#define MAX_LABELS 8
+#define MAX_LABELS 16
 
 extern double get_game_uptime(void);
 

@@ -5,7 +5,7 @@
 
 #define MAX_GAME_OBJECTS 32
 #define MAX_ENTITIES 32
-#define MAX_LABELS 8
+#define MAX_LABELS 16
 #define DRAW_LOOP 64
 
 /*
