@@ -1,7 +1,6 @@
 #include "gameengine.h"
 #include <stdbool.h>
-#include "icons.h"
-#include "utilities.h"
+#include "scenes.h"
 
 // Give these functions a bigger scope.
 void(init_inputscene)();
@@ -19,7 +18,7 @@ static void select_item() {
 
     if (selected_item == 5) {
         unload_inputscene();
-        init_menuscene();
+        init_gamescene();
     } else {
         if (name[selected_item][0] == ' ') {
             name[selected_item][0] = 'A';

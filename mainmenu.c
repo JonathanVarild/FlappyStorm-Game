@@ -1,7 +1,6 @@
 #include "gameengine.h"
 #include <stdbool.h>
-#include "icons.h"
-#include "utilities.h"
+#include "scenes.h"
 
 static struct label *title;
 static struct label *menu_items[2];
@@ -16,9 +15,9 @@ void(update_menuscene)();
 
 static void select_item() {
     if (selected_item == 0) {
-        // Start game
+        // Open name selection scene.
         unload_menuscene();
-        init_gamescene();
+        init_inputscene();
     } else if (selected_item == 1) {
         // Leaderboard
     }
