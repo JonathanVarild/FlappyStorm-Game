@@ -14,6 +14,7 @@ double next_lightning;
 struct game_object *obstacles[20] = {0};
 struct game_object *lightnings[20] = {0};
 struct entity *rain_drops[20] = {0};
+struct game_object *powerups[20] = {0};
 
 int next_lightnings[20] = {0};
 int next_rain_drops[20] = {0};
@@ -34,6 +35,7 @@ enum obstacle_type
 
 // Variables used in game scene.
 bool alive = true;
+int invincible_until = false;
 int startTime;
 int score;
 char score_text[4];
@@ -96,6 +98,9 @@ void go_right()
 // Function to end the game.
 void game_over()
 {
+    if (invincible_until > get_game_uptime()) {
+        return;
+    }
     set_label_text(score_label, "Game Over", true);
     set_game_paused(true);
     alive = false;
@@ -161,6 +166,20 @@ void generate_cloud()
     }
 }
 
+void generate_powerup()
+{
+    int i;
+    for (i = 0; i < 20; i++)
+    {
+        if (powerups[i] == NULL || !powerups[i]->active)
+        {
+            powerups[i] = create_game_object((struct vector2D){128 + icon_star_width, get_random_int(icon_star_height,32)}, icon_star_width, icon_star_height);
+            set_game_object_graphic(powerups[i], icon_star);
+            return;
+        }
+    }
+}
+
 // Function to update the game scene. This function is called every game tick.
 void update_gamescene()
 {
@@ -169,8 +188,15 @@ void update_gamescene()
     {
         // Spawn the obstacle and set the next obstacle respawn.
         next_obstacle = get_game_uptime() + 5;
-        
-        if (get_random_int(0,10) > 3)
+
+        // Get random number.
+        int r = get_random_int(0, 20);
+
+        if (r < 2)
+        {
+            generate_powerup();
+        }
+        else if (r < 12)
         {
             generate_pipes();
         }
@@ -183,7 +209,7 @@ void update_gamescene()
     // Get the player coliision box.
     struct collision_box player_box = get_entity_collision_box(player);
 
-    // Loop through all obstacles.
+    // Loop through all level objects.
     int i;
     for (i = 0; i < 20; i++)
     {
@@ -210,8 +236,8 @@ void update_gamescene()
             if (obstacles[i]->type == CLOUD_LIGHTNING && lightnings[i] != NULL && lightnings[i]->active)
             {
                 // Set the position of the lightning.
-                set_game_object_position(lightnings[i], (struct vector2D){obstacles[i]->position.x + icon_lightning_width / 2, obstacles[i]->position.y + icon_lightning_height + 3});            
-            
+                set_game_object_position(lightnings[i], (struct vector2D){obstacles[i]->position.x + icon_lightning_width / 2, obstacles[i]->position.y + icon_lightning_height + 3});
+
                 // Get the collision box of the player.
                 struct collision_box lightning_box = get_game_object_collision_box(lightnings[i]);
 
@@ -231,7 +257,8 @@ void update_gamescene()
             }
 
             // Check if the cloud should spawn a lightning.
-            if (obstacles[i]->type == CLOUD && next_lightnings[i] < get_game_uptime()) {
+            if (obstacles[i]->type == CLOUD && next_lightnings[i] < get_game_uptime())
+            {
                 next_lightnings[i] = get_game_uptime() + 2 + get_random_int(0, 2);
 
                 lightnings[i] = create_game_object((struct vector2D){obstacles[i]->position.x + icon_lightning_width / 2, obstacles[i]->position.y + icon_lightning_height + 1}, icon_lightning_width, icon_lightning_height);
@@ -242,7 +269,8 @@ void update_gamescene()
             }
 
             // Check if the cloud should spawn a rain drop.
-            if (obstacles[i]->type == CLOUD && next_rain_drops[i] < get_game_uptime()) {
+            if (obstacles[i]->type == CLOUD && next_rain_drops[i] < get_game_uptime())
+            {
                 next_rain_drops[i] = get_game_uptime() + 0.5 + get_random_int(1, 2);
 
                 generate_rain_drop((struct vector2D){obstacles[i]->position.x + get_random_int(-icon_cloud_width / 2, icon_cloud_width / 2), obstacles[i]->position.y});
@@ -264,11 +292,26 @@ void update_gamescene()
                 obstacles[i] = NULL;
             }
         }
-    }
+   
+        // Check if the powerup is active.
+        if (powerups[i] != NULL && powerups[i]->active)
+        {
+            // Move the powerup to the left.
+            set_game_object_position(powerups[i], (struct vector2D){powerups[i]->position.x - 0.2, powerups[i]->position.y});
 
-    // Loop through all rain drops.
-    for (i = 0; i < 20; i++)
-    {
+            // Get the collision box of the powerup.
+            struct collision_box powerup_box = get_game_object_collision_box(powerups[i]);
+
+            // Check if the player is colliding with the powerup.
+            if (player_box.x_right > powerup_box.x_left && player_box.x_left < powerup_box.x_right && player_box.y_bottom > powerup_box.y_top && player_box.y_top < powerup_box.y_bottom)
+            {
+                remove_game_object(powerups[i]);
+                powerups[i] = NULL;
+                invincible_until = get_game_uptime() + 10;
+                
+            }
+        }
+    
         // Check if the rain drop is active.
         if (rain_drops[i] != NULL && rain_drops[i]->active)
         {
@@ -298,9 +341,20 @@ void update_gamescene()
     get_score(score_text);
 
     // Update label if the score has changed.
-    if (score_label->text != score_text && !get_game_paused())
+    if (invincible_until > get_game_uptime()) {
+        set_label_text(score_label, "INVINCIBLE", true);
+    }
+    else if (score_label->text != score_text && !get_game_paused())
     {
         set_label_text(score_label, score_text, true);
+    }
+
+    // Check if the player is invincible.
+    if (invincible_until > get_game_uptime()) {
+        set_entity_visibility(player, (int)(get_game_uptime() * 10) % 2);
+    }
+    else {
+        set_entity_visibility(player, true);
     }
 
     // Check if the player is on the ground.
@@ -324,6 +378,9 @@ void init_gamescene()
 
     // Set the player as alive.
     alive = true;
+
+    // Set invincible_until.
+    invincible_until = 0;
 
     // Pause the game.
     set_game_paused(true);
@@ -379,19 +436,14 @@ void unload_gamescene()
             // Remove the obstacle.
             remove_game_object(obstacles[i]);
         }
+
+        // Check if the lightning is active.
         if (lightnings[i] != NULL && lightnings[i]->active)
         {
             // Remove the lightning.
             remove_game_object(lightnings[i]);
         }
 
-        obstacles[i] = NULL;
-        lightnings[i] = NULL;
-    }
-
-    // Loop through all rain drops.
-    for (i = 0; i < 20; i++)
-    {
         // Check if the rain drop is active.
         if (rain_drops[i] != NULL && rain_drops[i]->active)
         {
@@ -399,7 +451,17 @@ void unload_gamescene()
             remove_entity(rain_drops[i]);
         }
 
+        // Check if the powerup is active.
+        if (powerups[i] != NULL && powerups[i]->active)
+        {
+            // Remove the powerup.
+            remove_game_object(powerups[i]);
+        }
+
+        obstacles[i] = NULL;
+        lightnings[i] = NULL;
         rain_drops[i] = NULL;
+        powerups[i] = NULL;
     }
 
     // Set the engine functions to NULL.
