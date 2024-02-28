@@ -398,6 +398,19 @@ void unload_gamescene()
         lightnings[i] = NULL;
     }
 
+    // Loop through all rain drops.
+    for (i = 0; i < 20; i++)
+    {
+        // Check if the rain drop is active.
+        if (rain_drops[i] != NULL && rain_drops[i]->active)
+        {
+            // Remove the rain drop.
+            remove_entity(rain_drops[i]);
+        }
+
+        rain_drops[i] = NULL;
+    }
+
     // Set the engine functions to NULL.
     on_game_tick = NULL;
     button_4_click = NULL;
