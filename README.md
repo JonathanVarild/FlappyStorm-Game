@@ -1,6 +1,7 @@
 # FlappyStorm-Game
+This project was created as a final project for the course IS1200 - Computer Hardware Engineering at (KTH) Royal Institute of Technology in Sweden. This is my first project in C and left me with a lot of new knowledge and experience in low-level programming. The code can run on a ChipKIT (PIC32) with an attached Basic I/O Shield.
 
-## Compile & install onto ChipKIT (PIC32)
+## Compile & install onto ChipKIT (PIC32):
 1. Enter the MCB32Tools Environment
 2. Enter the project directory.
 3. Write command "make"
@@ -35,3 +36,7 @@
 * Button 4: Jump / Restart
 * Button 3: Go left / Go to main menu
 * Button 2: Go right / Go to main menu
+
+## Credits:
+This project includes small amounts of code written by other developers.
+See credits.md for more information!
