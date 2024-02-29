@@ -3,11 +3,6 @@
 #include "scenes.h"
 #include "player_manager.h"
 
-// Give these functions a bigger scope.
-void(init_inputscene)(int selected_player_ID);
-void(unload_inputscene)();
-void(update_inputscene)();
-
 static Label *title;
 static Label *menu_items[6];
 static int selected_item;
