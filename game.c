@@ -6,26 +6,25 @@
 #include "player_manager.h"
 
 // Give entities/labels/game objects a bigger scope.
-struct label *top_label;
-struct label *middle_label;
-struct entity *player;
+static struct label *top_label;
+static struct label *middle_label;
+static struct entity *player;
 
-struct game_object *ground;
+static struct game_object *ground;
 
-double next_obstacle;
-double next_lightning;
-struct game_object *obstacles[20] = {0};
-struct game_object *lightnings[20] = {0};
-struct entity *rain_drops[20] = {0};
-struct game_object *powerups[20] = {0};
+static double next_obstacle;
+static double next_lightning;
+static struct game_object *obstacles[20] = {0};
+static struct game_object *lightnings[20] = {0};
+static struct entity *rain_drops[20] = {0};
+static struct game_object *powerups[20] = {0};
 
-int next_lightnings[20] = {0};
-int next_rain_drops[20] = {0};
+static int next_lightnings[20] = {0};
+static int next_rain_drops[20] = {0};
 
 // Give these functions a bigger scope.
-void(init_gamescene)(int player_ID);
+void(init_gamescene)(int selected_player_ID);
 void(unload_gamescene)();
-void(update_gamescene)();
 
 // Create enumeration for obstacle types.
 enum obstacle_type
@@ -37,15 +36,15 @@ enum obstacle_type
 };
 
 // Variables used in game scene.
-bool alive = true;
-int invincible_until = false;
-int startTime;
-int score;
-char score_text[4];
-int player_ID;
+static bool alive = true;
+static int invincible_until = false;
+static int startTime;
+static int score;
+static char score_text[4];
+static int player_ID;
 
 // Function to remove all objects.
-void remove_all_objects()
+static void remove_all_objects()
 {
     // Check if the player exists.
     if (player != NULL && player->active)
@@ -94,7 +93,7 @@ void remove_all_objects()
 }
 
 // Function to get the current score.
-void get_score(char s[4])
+static void get_score(char s[4])
 {
     // Calculate the score.
     score = (int)(get_game_uptime() - startTime);
@@ -107,7 +106,7 @@ void get_score(char s[4])
 }
 
 // Function to make the player jump and start game.
-void jump()
+static void jump()
 {
     // Check if the game is paused.
     if (get_game_paused())
@@ -135,7 +134,7 @@ void jump()
 }
 
 // Function to move the player left.
-void go_left()
+static void go_left()
 {
     // Check if the game is paused.
     if (get_game_paused())
@@ -151,7 +150,7 @@ void go_left()
 }
 
 // Function to move the player right.
-void go_right()
+static void go_right()
 {
     // Check if the game is paused.
     if (get_game_paused())
@@ -167,7 +166,7 @@ void go_right()
 }
 
 // Function to end the game.
-void game_over()
+static void game_over()
 {
     // Check if the player is invincible.
     if (invincible_until > get_game_uptime())
@@ -202,7 +201,7 @@ void game_over()
     alive = false;
 }
 
-void generate_rain_drop(struct vector2D pos)
+static void generate_rain_drop(struct vector2D pos)
 {
     int i;
     for (i = 0; i < 20; i++)
@@ -215,7 +214,7 @@ void generate_rain_drop(struct vector2D pos)
     }
 }
 
-void generate_pipes()
+static void generate_pipes()
 {
     int y_offset = get_random_int(-2, 2);
     bool upper_pipe = true;
@@ -242,7 +241,7 @@ void generate_pipes()
     }
 }
 
-void generate_cloud()
+static void generate_cloud()
 {
     int i;
     for (i = 0; i < 20; i++)
@@ -262,7 +261,7 @@ void generate_cloud()
     }
 }
 
-void generate_powerup()
+static void generate_powerup()
 {
     int i;
     for (i = 0; i < 20; i++)
@@ -277,7 +276,7 @@ void generate_powerup()
 }
 
 // Function to update the game scene. This function is called every game tick.
-void update_gamescene()
+static void update_gamescene()
 {
     // Check if an obstacle should spawn.
     if (next_obstacle < get_game_uptime())
@@ -471,10 +470,10 @@ void update_gamescene()
     }
 }
 
-void init_gamescene(int player_ID)
+void init_gamescene(int selected_player_ID)
 {
     // Set the player.
-    player_ID = player_ID;
+    player_ID = selected_player_ID;
 
     // Update random seed.
     set_random_seed((unsigned long)(get_game_uptime() * 100));
