@@ -1,7 +1,7 @@
 #include "gameengine.h"
+#include "screenengine.h"
 #include <stdbool.h>
 #include <stdlib.h>
-#include "screenengine.h"
 #include <stdint.h>
 
 /*
