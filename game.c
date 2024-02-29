@@ -5,22 +5,31 @@
 #include "scenes.h"
 #include "player_manager.h"
 
-// Give entities/labels/game objects a bigger scope.
+// Define base objects
 static Label *top_label;
 static Label *middle_label;
 static Entity *player;
-
 static Game_object *ground;
 
-static double movement_speed;
-static double spawn_rate;
-static double next_obstacle;
-static double next_lightning;
+// Define arrays for dynamic objects.
 static Game_object *obstacles[20] = {0};
 static Game_object *lightnings[20] = {0};
 static Entity *rain_drops[20] = {0};
 static Game_object *powerups[20] = {0};
 
+// Define game variables.
+static int player_ID;
+static bool alive = true;
+static int start_time;
+static int score;
+static char score_text[4];
+static double movement_speed;
+static double spawn_rate;
+static double next_obstacle;
+static double next_lightning;
+static int invincible_until = false;
+
+// Define arrays for dynamic objects.
 static int next_lightnings[20] = {0};
 static int next_rain_drops[20] = {0};
 
@@ -32,14 +41,6 @@ enum obstacle_type
     CLOUD_LIGHTNING,
     LIGHTNING,
 };
-
-// Variables used in game scene.
-static bool alive = true;
-static int invincible_until = false;
-static int start_time;
-static int score;
-static char score_text[4];
-static int player_ID;
 
 // Function to remove all objects.
 static void remove_all_objects()
