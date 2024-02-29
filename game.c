@@ -24,10 +24,6 @@ static Game_object *powerups[20] = {0};
 static int next_lightnings[20] = {0};
 static int next_rain_drops[20] = {0};
 
-// Give these functions a bigger scope.
-void(init_gamescene)(int selected_player_ID);
-void(unload_gamescene)();
-
 // Create enumeration for obstacle types.
 enum obstacle_type
 {
