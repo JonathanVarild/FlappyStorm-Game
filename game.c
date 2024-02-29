@@ -12,6 +12,8 @@ static struct entity *player;
 
 static struct game_object *ground;
 
+static double movement_speed;
+static double spawn_rate;
 static double next_obstacle;
 static double next_lightning;
 static struct game_object *obstacles[20] = {0};
@@ -38,7 +40,7 @@ enum obstacle_type
 // Variables used in game scene.
 static bool alive = true;
 static int invincible_until = false;
-static int startTime;
+static int start_time;
 static int score;
 static char score_text[4];
 static int player_ID;
@@ -96,7 +98,7 @@ static void remove_all_objects()
 static void get_score(char s[4])
 {
     // Calculate the score.
-    score = (int)(get_game_uptime() - startTime);
+    score = (int)(get_game_uptime() - start_time);
 
     // Convert the score to a string.
     s[0] = '0' + (score / 100) % 10;
@@ -282,7 +284,15 @@ static void update_gamescene()
     if (next_obstacle < get_game_uptime())
     {
         // Spawn the obstacle and set the next obstacle respawn.
-        next_obstacle = get_game_uptime() + 5;
+        next_obstacle = get_game_uptime() + spawn_rate;
+
+        if (spawn_rate - 0.15 > 2) {
+            spawn_rate -= 0.15;
+        }
+
+        if (movement_speed + 0.01 < 0.4) {
+            movement_speed += 0.01;
+        }
 
         // Get random number.
         int r = get_random_int(0, 20);
@@ -312,7 +322,7 @@ static void update_gamescene()
         if (obstacles[i] != NULL && obstacles[i]->active)
         {
             // Move the obstacle to the left.
-            set_game_object_position(obstacles[i], (struct vector2D){obstacles[i]->position.x - 0.2, obstacles[i]->position.y});
+            set_game_object_position(obstacles[i], (struct vector2D){obstacles[i]->position.x - movement_speed, obstacles[i]->position.y});
 
             // Check if the player can collide with the obstacle.
             if (obstacles[i]->type == PIPE || obstacles[i]->type == CLOUD_LIGHTNING)
@@ -394,7 +404,7 @@ static void update_gamescene()
         if (powerups[i] != NULL && powerups[i]->active)
         {
             // Move the powerup to the left.
-            set_game_object_position(powerups[i], (struct vector2D){powerups[i]->position.x - 0.2, powerups[i]->position.y});
+            set_game_object_position(powerups[i], (struct vector2D){powerups[i]->position.x - movement_speed, powerups[i]->position.y});
 
             // Get the collision box of the powerup.
             struct collision_box powerup_box = get_game_object_collision_box(powerups[i]);
@@ -404,7 +414,14 @@ static void update_gamescene()
             {
                 remove_game_object(powerups[i]);
                 powerups[i] = NULL;
-                invincible_until = get_game_uptime() + 10;
+
+                int difficulty_sub = (int)(get_game_uptime() - start_time) / 10;
+
+                if (difficulty_sub > 7) {
+                    difficulty_sub = 7;
+                }
+
+                invincible_until = get_game_uptime() + 10 - difficulty_sub;
             }
         }
 
@@ -412,7 +429,7 @@ static void update_gamescene()
         if (rain_drops[i] != NULL && rain_drops[i]->active)
         {
             // Move the rain drop.
-            set_entity_position(rain_drops[i], (struct vector2D){rain_drops[i]->position.x - 0.2, rain_drops[i]->position.y});
+            set_entity_position(rain_drops[i], (struct vector2D){rain_drops[i]->position.x - movement_speed, rain_drops[i]->position.y});
 
             // Check if the rain drop is off screen.
             if (rain_drops[i]->on_ground)
@@ -425,7 +442,7 @@ static void update_gamescene()
     }
 
     // Update location of ground.
-    set_game_object_position(ground, (struct vector2D){ground->position.x - 0.2, ground->position.y});
+    set_game_object_position(ground, (struct vector2D){ground->position.x - movement_speed, ground->position.y});
 
     // Update location of ground if it goes off screen.
     if (ground->position.x <= 0)
@@ -488,10 +505,16 @@ void init_gamescene(int selected_player_ID)
     set_game_paused(true);
 
     // Get the start time.
-    startTime = get_game_uptime();
+    start_time = get_game_uptime();
 
     // Set the next obstacle spawn time.
     next_obstacle = get_game_uptime();
+
+    // Set the spawn rate.
+    spawn_rate = 5;
+
+    // Set the movement speed.
+    movement_speed = 0.2;
 
     // Set engine functions for buttons.
     button_4_click = jump;
