@@ -5,6 +5,8 @@
 #include <stdbool.h>
 
 // Screen definitions.
+// External Code Reference: Definitions below.
+// Source: IS1200/IS1500 - Lab 3 – I/O Programming
 #define DISPLAY_VDD_PORT PORTF
 #define DISPLAY_VDD_MASK 0x40
 #define DISPLAY_VBATT_PORT PORTF
@@ -18,6 +20,8 @@
 static uint8_t display_matrix[4][128] = {0};
 
 // Array for the text font.
+// External Code Reference: Array "text_font" contains slightly modified data from the following source.
+// Source: IS1200/IS1500 - Lab 3 – I/O Programming
 static uint8_t text_font[95][8] = {
     {0, 0, 0, 94, 0, 0, 0, 0},        // '!'
     {0, 0, 4, 3, 4, 3, 0, 0},         // '"'
@@ -117,6 +121,8 @@ static uint8_t text_font[95][8] = {
 };
 
 // Function to communicate with the display.
+// External Code Reference: Function "spi_send_recv" has been copied from the following source.
+// Source: IS1200/IS1500 - Lab 3 – I/O Programming
 static uint8_t spi_send_recv(uint8_t data)
 {
     while (!(SPI2STAT & 0x08));
@@ -126,6 +132,8 @@ static uint8_t spi_send_recv(uint8_t data)
 }
 
 // Function to initialize the display.
+// External Code Reference: Function "display_init" contains code from the following source.
+// Source: IS1200/IS1500 - Lab 3 – I/O Programming
 void display_init()
 {
     /* Set up peripheral bus clock */
@@ -146,6 +154,7 @@ void display_init()
 
     /* Clear SPIROV*/
     SPI2STATCLR &= ~0x40;
+
     /* Set CKP = 1, MSTEN = 1; */
     SPI2CON |= 0x60;
 

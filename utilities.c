@@ -27,6 +27,8 @@ int get_random_int(int min, int max) {
 }
 
 // Create a function to wait for a number of cycles.
+// External Code Reference: Function "tick_delay"
+// Source: IS1200/IS1500 - Lab 3 – I/O Programming
 void tick_delay(int cyc) {
 	int i;
 	for(i = cyc; i > 0; i--);
