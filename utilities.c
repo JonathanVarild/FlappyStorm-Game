@@ -4,7 +4,7 @@
 #define C 12345 // Increment
 
 // Create a variable for the seed.
-unsigned long random_seed = 1;
+unsigned static long random_seed = 1;
 
 // Create a function to set the seed.
 void set_random_seed(unsigned long seed) {
