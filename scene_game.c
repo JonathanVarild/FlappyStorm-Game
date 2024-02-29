@@ -27,7 +27,7 @@ static double movement_speed;
 static double spawn_rate;
 static double next_obstacle;
 static double next_lightning;
-static int invincible_until = false;
+static int invincible_until = 0;
 
 // Define arrays for dynamic objects.
 static int next_lightnings[20] = {0};
