@@ -3,6 +3,7 @@
 
 #include <pic32mx.h>
 #include <stdint.h>
+#include "utilities.h"
 #include <stdbool.h>
 
 // Define the display dimensions.

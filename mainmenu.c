@@ -2,6 +2,7 @@
 #include <stdbool.h>
 #include "scenes.h"
 
+
 // Create pointers for the title and menu items.
 static Label *title;
 static Label *menu_items[2];
