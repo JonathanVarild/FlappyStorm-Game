@@ -3,8 +3,8 @@
 #include "scenes.h"
 #include "player_manager.h"
 
-static struct label *title;
-static struct label *menu_items[3];
+static Label *title;
+static Label *menu_items[3];
 
 static int selected_item;
 
@@ -50,12 +50,12 @@ void init_playerscene()
 
     selected_item = 0;
 
-    title = create_label("Choose player:", (struct vector2D){64, 0}, true, false);
+    title = create_label("Choose player:", (Vector2D){64, 0}, true, false);
 
     int i;
     for (i = 0; i < 3; i++)
     {
-        menu_items[i] = create_label(player_names[i][0][0] == ' ' ? "Empty slot" : formatted_names[i], (struct vector2D){64, 8 + i * 8}, true, i == 0);
+        menu_items[i] = create_label(player_names[i][0][0] == ' ' ? "Empty slot" : formatted_names[i], (Vector2D){64, 8 + i * 8}, true, i == 0);
     }
 }
 

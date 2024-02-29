@@ -2,8 +2,8 @@
 #include <stdbool.h>
 #include "scenes.h"
 
-static struct label *title;
-static struct label *menu_items[2];
+static Label *title;
+static Label *menu_items[2];
 
 static int selected_item;
 static double title_y;
@@ -46,14 +46,14 @@ void update_menuscene()
     if (title_y > 0 && get_game_uptime() > 2)
     {
         title_y -= 0.5;
-        set_label_position(title, (struct vector2D){64, title_y});
+        set_label_position(title, (Vector2D){64, title_y});
     }
     else if ((int)(title_y) == 0 && selected_item == -1)
     {
         selected_item = 0;
 
-        menu_items[0] = create_label("Start", (struct vector2D){64, 16}, true, true);
-        menu_items[1] = create_label("Leaderboard", (struct vector2D){64, 24}, true, false);
+        menu_items[0] = create_label("Start", (Vector2D){64, 16}, true, true);
+        menu_items[1] = create_label("Leaderboard", (Vector2D){64, 24}, true, false);
 
         button_4_click = select_item;
         button_3_click = change_item;
@@ -70,7 +70,7 @@ void init_menuscene()
 
     title_y = 12;
 
-    title = create_label("FlappyStorm", (struct vector2D){64, title_y}, true, false);
+    title = create_label("FlappyStorm", (Vector2D){64, title_y}, true, false);
 }
 
 // Function to unload the game scene.

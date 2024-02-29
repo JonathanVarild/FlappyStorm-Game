@@ -10,75 +10,75 @@
 #define MAX_LABELS 16
 #define DRAW_LOOP 32
 
-struct vector2D {
+typedef struct {
     double x;
     double y;
-};
+} Vector2D;
 
-struct collision_box {
+typedef struct {
     int x_left;
     int x_right;
     int y_top;
     int y_bottom;
-};
+} Collision_box;
 
-struct game_object
-{
+
+typedef struct {
     bool active;
     bool is_visible;
-    struct vector2D position;
+    Vector2D position;
     int width;
     int height;
     double age;
     int type;
     uint8_t *graphic;
-};
+} Game_object;
 
-struct entity
-{
+
+typedef struct {
     bool active;
     bool is_visible;
-    struct vector2D position;
-    struct vector2D velocity;
+    Vector2D position;
+    Vector2D velocity;
     bool on_ground;
     int width;
     int height;
     double age;
     int type;
     uint8_t *graphic;
-};
+} Entity;
 
-struct label {
+typedef struct {
     bool active;
     char *text;
-    struct vector2D position;
+    Vector2D position;
     int x_offset;
     bool selected;
-};
+} Label;
 
-struct game_object *create_game_object(struct vector2D pos, int width, int height);
-struct entity *create_entity(struct vector2D pos, int width, int height);
-struct label *create_label(char *text, struct vector2D pos, bool centered, bool selected);
+Game_object *create_game_object(Vector2D pos, int width, int height);
+Entity *create_entity(Vector2D pos, int width, int height);
+Label *create_label(char *text, Vector2D pos, bool centered, bool selected);
 
-void remove_game_object(struct game_object *obj);
-void remove_entity(struct entity *ent);
-void remove_label(struct label *lbl);
+void remove_game_object(Game_object *obj);
+void remove_entity(Entity *ent);
+void remove_label(Label *lbl);
 
-void set_game_object_position(struct game_object *obj, struct vector2D pos);
-void set_entity_position(struct entity *ent, struct vector2D pos);
-void set_label_position(struct label *lbl, struct vector2D pos);
-void set_entity_velocity(struct entity *ent, struct vector2D vel);
-void set_game_object_graphic(struct game_object *obj, uint8_t *graphic);
-void set_entity_graphic(struct entity *ent, uint8_t *graphic);
-void set_label_selected(struct label *lbl, bool selected);
-void set_label_text(struct label *lbl, char *text, bool centered);
-void set_entity_type(struct entity *ent, int type);
-void set_game_object_type(struct game_object *obj, int type);
-void set_entity_visibility(struct entity *ent, bool visible);
-void set_game_object_visibility(struct game_object *obj, bool visible);
+void set_game_object_position(Game_object *obj, Vector2D pos);
+void set_entity_position(Entity *ent, Vector2D pos);
+void set_label_position(Label *lbl, Vector2D pos);
+void set_entity_velocity(Entity *ent, Vector2D vel);
+void set_game_object_graphic(Game_object *obj, uint8_t *graphic);
+void set_entity_graphic(Entity *ent, uint8_t *graphic);
+void set_label_selected(Label *lbl, bool selected);
+void set_label_text(Label *lbl, char *text, bool centered);
+void set_entity_type(Entity *ent, int type);
+void set_game_object_type(Game_object *obj, int type);
+void set_entity_visibility(Entity *ent, bool visible);
+void set_game_object_visibility(Game_object *obj, bool visible);
 
-struct collision_box get_game_object_collision_box(struct game_object *obj);
-struct collision_box get_entity_collision_box(struct entity *ent);
+Collision_box get_game_object_collision_box(Game_object *obj);
+Collision_box get_entity_collision_box(Entity *ent);
 
 void (*on_game_tick)(void);
 

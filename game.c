@@ -6,20 +6,20 @@
 #include "player_manager.h"
 
 // Give entities/labels/game objects a bigger scope.
-static struct label *top_label;
-static struct label *middle_label;
-static struct entity *player;
+static Label *top_label;
+static Label *middle_label;
+static Entity *player;
 
-static struct game_object *ground;
+static Game_object *ground;
 
 static double movement_speed;
 static double spawn_rate;
 static double next_obstacle;
 static double next_lightning;
-static struct game_object *obstacles[20] = {0};
-static struct game_object *lightnings[20] = {0};
-static struct entity *rain_drops[20] = {0};
-static struct game_object *powerups[20] = {0};
+static Game_object *obstacles[20] = {0};
+static Game_object *lightnings[20] = {0};
+static Entity *rain_drops[20] = {0};
+static Game_object *powerups[20] = {0};
 
 static int next_lightnings[20] = {0};
 static int next_rain_drops[20] = {0};
@@ -132,7 +132,7 @@ static void jump()
     set_random_seed(get_game_uptime() * 100 * (player->position.x + player->position.y + player->velocity.x + player->velocity.y));
 
     // Make the bird fly.
-    set_entity_velocity(player, (struct vector2D){player->velocity.x, -3});
+    set_entity_velocity(player, (Vector2D){player->velocity.x, -3});
 }
 
 // Function to move the player left.
@@ -147,7 +147,7 @@ static void go_left()
     else
     {
         set_random_seed(get_game_uptime() * 100 * (player->position.x + player->position.y + player->velocity.x + player->velocity.y));
-        set_entity_velocity(player, (struct vector2D){-3, player->velocity.y});
+        set_entity_velocity(player, (Vector2D){-3, player->velocity.y});
     }
 }
 
@@ -163,7 +163,7 @@ static void go_right()
     else
     {
         set_random_seed(get_game_uptime() * 100 * (player->position.x + player->position.y + player->velocity.x + player->velocity.y));
-        set_entity_velocity(player, (struct vector2D){3, player->velocity.y});
+        set_entity_velocity(player, (Vector2D){3, player->velocity.y});
     }
 }
 
@@ -196,14 +196,14 @@ static void game_over()
     }
 
     // Create the middle label.
-    middle_label = create_label(score_text, (struct vector2D){64, 16}, true, false);
+    middle_label = create_label(score_text, (Vector2D){64, 16}, true, false);
 
     // Stop the game.
     set_game_paused(true);
     alive = false;
 }
 
-static void generate_rain_drop(struct vector2D pos)
+static void generate_rain_drop(Vector2D pos)
 {
     int i;
     for (i = 0; i < 20; i++)
@@ -227,14 +227,14 @@ static void generate_pipes()
         {
             if (upper_pipe)
             {
-                obstacles[i] = create_game_object((struct vector2D){128 + icon_pipe_upper_width, 7 + y_offset}, icon_pipe_upper_width, icon_pipe_upper_height);
+                obstacles[i] = create_game_object((Vector2D){128 + icon_pipe_upper_width, 7 + y_offset}, icon_pipe_upper_width, icon_pipe_upper_height);
                 set_game_object_graphic(obstacles[i], icon_pipe_upper);
                 set_game_object_type(obstacles[i], PIPE);
                 upper_pipe = false;
             }
             else
             {
-                obstacles[i] = create_game_object((struct vector2D){128 + icon_pipe_lower_width, 35 + y_offset}, icon_pipe_lower_width, icon_pipe_lower_height);
+                obstacles[i] = create_game_object((Vector2D){128 + icon_pipe_lower_width, 35 + y_offset}, icon_pipe_lower_width, icon_pipe_lower_height);
                 set_game_object_graphic(obstacles[i], icon_pipe_lower);
                 set_game_object_type(obstacles[i], PIPE);
                 return;
@@ -252,7 +252,7 @@ static void generate_cloud()
         {
             int y_offset = get_random_int(-2, 4);
 
-            obstacles[i] = create_game_object((struct vector2D){128 + icon_cloud_width, 10 + y_offset}, icon_cloud_width, icon_cloud_height);
+            obstacles[i] = create_game_object((Vector2D){128 + icon_cloud_width, 10 + y_offset}, icon_cloud_width, icon_cloud_height);
             set_game_object_graphic(obstacles[i], icon_cloud);
             set_game_object_type(obstacles[i], CLOUD);
 
@@ -270,7 +270,7 @@ static void generate_powerup()
     {
         if (powerups[i] == NULL || !powerups[i]->active)
         {
-            powerups[i] = create_game_object((struct vector2D){128 + icon_star_width, get_random_int(icon_star_height, 32)}, icon_star_width, icon_star_height);
+            powerups[i] = create_game_object((Vector2D){128 + icon_star_width, get_random_int(icon_star_height, 32)}, icon_star_width, icon_star_height);
             set_game_object_graphic(powerups[i], icon_star);
             return;
         }
@@ -312,7 +312,7 @@ static void update_gamescene()
     }
 
     // Get the player coliision box.
-    struct collision_box player_box = get_entity_collision_box(player);
+    Collision_box player_box = get_entity_collision_box(player);
 
     // Loop through all level objects.
     int i;
@@ -322,13 +322,13 @@ static void update_gamescene()
         if (obstacles[i] != NULL && obstacles[i]->active)
         {
             // Move the obstacle to the left.
-            set_game_object_position(obstacles[i], (struct vector2D){obstacles[i]->position.x - movement_speed, obstacles[i]->position.y});
+            set_game_object_position(obstacles[i], (Vector2D){obstacles[i]->position.x - movement_speed, obstacles[i]->position.y});
 
             // Check if the player can collide with the obstacle.
             if (obstacles[i]->type == PIPE || obstacles[i]->type == CLOUD_LIGHTNING)
             {
                 // Get the collision box of the obstacle.
-                struct collision_box obstacle_box = get_game_object_collision_box(obstacles[i]);
+                Collision_box obstacle_box = get_game_object_collision_box(obstacles[i]);
 
                 // Check if the player is colliding with the obstacle.
                 if (player_box.x_right > obstacle_box.x_left && player_box.x_left < obstacle_box.x_right && player_box.y_bottom > obstacle_box.y_top && player_box.y_top < obstacle_box.y_bottom)
@@ -341,10 +341,10 @@ static void update_gamescene()
             if (obstacles[i]->type == CLOUD_LIGHTNING && lightnings[i] != NULL && lightnings[i]->active)
             {
                 // Set the position of the lightning.
-                set_game_object_position(lightnings[i], (struct vector2D){obstacles[i]->position.x + icon_lightning_width / 2, obstacles[i]->position.y + icon_lightning_height + 3});
+                set_game_object_position(lightnings[i], (Vector2D){obstacles[i]->position.x + icon_lightning_width / 2, obstacles[i]->position.y + icon_lightning_height + 3});
 
                 // Get the collision box of the player.
-                struct collision_box lightning_box = get_game_object_collision_box(lightnings[i]);
+                Collision_box lightning_box = get_game_object_collision_box(lightnings[i]);
 
                 // Check if the player is colliding with the lightning.
                 if (player_box.x_right > lightning_box.x_left && player_box.x_left < lightning_box.x_right && player_box.y_bottom > lightning_box.y_top && player_box.y_top < lightning_box.y_bottom)
@@ -367,7 +367,7 @@ static void update_gamescene()
             {
                 next_lightnings[i] = get_game_uptime() + 2 + get_random_int(0, 2);
 
-                lightnings[i] = create_game_object((struct vector2D){obstacles[i]->position.x + icon_lightning_width / 2, obstacles[i]->position.y + icon_lightning_height + 1}, icon_lightning_width, icon_lightning_height);
+                lightnings[i] = create_game_object((Vector2D){obstacles[i]->position.x + icon_lightning_width / 2, obstacles[i]->position.y + icon_lightning_height + 1}, icon_lightning_width, icon_lightning_height);
                 set_game_object_graphic(lightnings[i], icon_lightning);
                 set_game_object_type(lightnings[i], LIGHTNING);
 
@@ -380,7 +380,7 @@ static void update_gamescene()
             {
                 next_rain_drops[i] = get_game_uptime() + 0.5 + get_random_int(1, 2);
 
-                generate_rain_drop((struct vector2D){obstacles[i]->position.x + get_random_int(-icon_cloud_width / 2, icon_cloud_width / 2), obstacles[i]->position.y});
+                generate_rain_drop((Vector2D){obstacles[i]->position.x + get_random_int(-icon_cloud_width / 2, icon_cloud_width / 2), obstacles[i]->position.y});
             }
 
             // Check if the obstacle is off screen.
@@ -404,10 +404,10 @@ static void update_gamescene()
         if (powerups[i] != NULL && powerups[i]->active)
         {
             // Move the powerup to the left.
-            set_game_object_position(powerups[i], (struct vector2D){powerups[i]->position.x - movement_speed, powerups[i]->position.y});
+            set_game_object_position(powerups[i], (Vector2D){powerups[i]->position.x - movement_speed, powerups[i]->position.y});
 
             // Get the collision box of the powerup.
-            struct collision_box powerup_box = get_game_object_collision_box(powerups[i]);
+            Collision_box powerup_box = get_game_object_collision_box(powerups[i]);
 
             // Check if the player is colliding with the powerup.
             if (player_box.x_right > powerup_box.x_left && player_box.x_left < powerup_box.x_right && player_box.y_bottom > powerup_box.y_top && player_box.y_top < powerup_box.y_bottom)
@@ -429,7 +429,7 @@ static void update_gamescene()
         if (rain_drops[i] != NULL && rain_drops[i]->active)
         {
             // Move the rain drop.
-            set_entity_position(rain_drops[i], (struct vector2D){rain_drops[i]->position.x - movement_speed, rain_drops[i]->position.y});
+            set_entity_position(rain_drops[i], (Vector2D){rain_drops[i]->position.x - movement_speed, rain_drops[i]->position.y});
 
             // Check if the rain drop is off screen.
             if (rain_drops[i]->on_ground)
@@ -442,12 +442,12 @@ static void update_gamescene()
     }
 
     // Update location of ground.
-    set_game_object_position(ground, (struct vector2D){ground->position.x - movement_speed, ground->position.y});
+    set_game_object_position(ground, (Vector2D){ground->position.x - movement_speed, ground->position.y});
 
     // Update location of ground if it goes off screen.
     if (ground->position.x <= 0)
     {
-        set_game_object_position(ground, (struct vector2D){ground->position.x + ground->width / 2, 32});
+        set_game_object_position(ground, (Vector2D){ground->position.x + ground->width / 2, 32});
     }
 
     // Get the current score.
@@ -482,8 +482,8 @@ static void update_gamescene()
     // Check if the player is colliding with the world edges.
     if (player->position.x < 0 || player->position.x > 128)
     {
-        set_entity_velocity(player, (struct vector2D){0, player->velocity.y});
-        set_entity_position(player, (struct vector2D){player->position.x < 0 ? 0 : 128, player->position.y});
+        set_entity_velocity(player, (Vector2D){0, player->velocity.y});
+        set_entity_position(player, (Vector2D){player->position.x < 0 ? 0 : 128, player->position.y});
     }
 }
 
@@ -525,14 +525,14 @@ void init_gamescene(int selected_player_ID)
     on_game_tick = update_gamescene;
 
     // Create the score label.
-    top_label = create_label("BTN4 to Start", (struct vector2D){64, 0}, true, false);
+    top_label = create_label("BTN4 to Start", (Vector2D){64, 0}, true, false);
 
     // Create the player.
-    player = create_entity((struct vector2D){20, 20}, icon_bird_width, icon_bird_height);
+    player = create_entity((Vector2D){20, 20}, icon_bird_width, icon_bird_height);
     set_entity_graphic(player, icon_bird);
 
     // Create the ground.
-    ground = create_game_object((struct vector2D){128, 32}, icon_ground_width, icon_ground_height);
+    ground = create_game_object((Vector2D){128, 32}, icon_ground_width, icon_ground_height);
     set_game_object_graphic(ground, icon_ground);
 
     // Set the engine ground level.

@@ -8,8 +8,8 @@ void(init_inputscene)(int selected_player_ID);
 void(unload_inputscene)();
 void(update_inputscene)();
 
-static struct label *title;
-static struct label *menu_items[6];
+static Label *title;
+static Label *menu_items[6];
 static int selected_item;
 static int player_ID;
 
@@ -69,16 +69,16 @@ void init_inputscene(int selected_player_ID)
     selected_item = 0;
 
     // Create the title label.
-    title = create_label("Enter your name:", (struct vector2D){64, 0}, true, false);
+    title = create_label("Enter your name:", (Vector2D){64, 0}, true, false);
 
     // Create the menu items.
     int i;
     for (i = 0; i < 5; i++) {
-        menu_items[i] = create_label("-", (struct vector2D){44 + 8 * i, 16}, false, i == 0);
+        menu_items[i] = create_label("-", (Vector2D){44 + 8 * i, 16}, false, i == 0);
     }
 
     // Create the confirm button.
-    menu_items[5] = create_label("Confirm", (struct vector2D){64, 24}, true, false);
+    menu_items[5] = create_label("Confirm", (Vector2D){64, 24}, true, false);
 
 }
 

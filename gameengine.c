@@ -8,15 +8,15 @@
 Object arrays
 */
 
-static struct game_object game_objects[MAX_GAME_OBJECTS] = {0};
-static struct entity entities[MAX_ENTITIES] = {0};
-static struct label labels[MAX_LABELS] = {0};
+static Game_object game_objects[MAX_GAME_OBJECTS] = {0};
+static Entity entities[MAX_ENTITIES] = {0};
+static Label labels[MAX_LABELS] = {0};
 
 /*
 Creation functions
 */
 
-struct game_object *create_game_object(struct vector2D pos, int width, int height)
+Game_object *create_game_object(Vector2D pos, int width, int height)
 {
     // Loop through all game objects.
     int i;
@@ -35,7 +35,7 @@ struct game_object *create_game_object(struct vector2D pos, int width, int heigh
     }
 }
 
-struct entity *create_entity(struct vector2D pos, int width, int height)
+Entity *create_entity(Vector2D pos, int width, int height)
 {
 
     // Loop through all entities.
@@ -58,7 +58,7 @@ struct entity *create_entity(struct vector2D pos, int width, int height)
     }
 }
 
-struct label *create_label(char *text, struct vector2D pos, bool centered, bool selected)
+Label *create_label(char *text, Vector2D pos, bool centered, bool selected)
 {
     // Loop through all labels.
     int i;
@@ -92,19 +92,19 @@ struct label *create_label(char *text, struct vector2D pos, bool centered, bool 
 Removal functions
 */
 
-void remove_game_object(struct game_object *obj)
+void remove_game_object(Game_object *obj)
 {
     obj->active = false;
     obj->graphic = NULL;
 }
 
-void remove_entity(struct entity *ent)
+void remove_entity(Entity *ent)
 {
     ent->active = false;
     ent->graphic = NULL;
 }
 
-void remove_label(struct label *lbl)
+void remove_label(Label *lbl)
 {
     lbl->active = false;
     lbl->text = NULL;
@@ -114,42 +114,42 @@ void remove_label(struct label *lbl)
 Setters
 */
 
-void set_game_object_position(struct game_object *obj, struct vector2D pos)
+void set_game_object_position(Game_object *obj, Vector2D pos)
 {
     obj->position = pos;
 }
 
-void set_entity_position(struct entity *ent, struct vector2D pos)
+void set_entity_position(Entity *ent, Vector2D pos)
 {
     ent->position = pos;
 }
 
-void set_label_position(struct label *lbl, struct vector2D pos)
+void set_label_position(Label *lbl, Vector2D pos)
 {
     lbl->position = pos;
 }
 
-void set_entity_velocity(struct entity *ent, struct vector2D vel)
+void set_entity_velocity(Entity *ent, Vector2D vel)
 {
     ent->velocity = vel;
 }
 
-void set_game_object_graphic(struct game_object *obj, uint8_t *graphic)
+void set_game_object_graphic(Game_object *obj, uint8_t *graphic)
 {
     obj->graphic = graphic;
 }
 
-void set_entity_graphic(struct entity *ent, uint8_t *graphic)
+void set_entity_graphic(Entity *ent, uint8_t *graphic)
 {
     ent->graphic = graphic;
 }
 
-void set_label_selected(struct label *lbl, bool selected)
+void set_label_selected(Label *lbl, bool selected)
 {
     lbl->selected = selected;
 }
 
-void set_label_text(struct label *lbl, char *text, bool centered)
+void set_label_text(Label *lbl, char *text, bool centered)
 {
     lbl->text = text;
 
@@ -170,22 +170,22 @@ void set_label_text(struct label *lbl, char *text, bool centered)
     }
 }
 
-void set_entity_type(struct entity *ent, int type)
+void set_entity_type(Entity *ent, int type)
 {
     ent->type = type;
 }
 
-void set_game_object_type(struct game_object *obj, int type)
+void set_game_object_type(Game_object *obj, int type)
 {
     obj->type = type;
 }
 
-void set_entity_visibility(struct entity *ent, bool visible)
+void set_entity_visibility(Entity *ent, bool visible)
 {
     ent->is_visible = visible;
 }
 
-void set_game_object_visibility(struct game_object *obj, bool visible)
+void set_game_object_visibility(Game_object *obj, bool visible)
 {
     obj->is_visible = visible;
 }
@@ -194,9 +194,9 @@ void set_game_object_visibility(struct game_object *obj, bool visible)
 Getters
 */
 
-struct collision_box get_game_object_collision_box(struct game_object *obj)
+Collision_box get_game_object_collision_box(Game_object *obj)
 {
-    struct collision_box box;
+    Collision_box box;
     box.x_left = obj->position.x;
     box.x_right = obj->position.x + obj->width;
     box.y_top = obj->position.y - obj->height;
@@ -204,9 +204,9 @@ struct collision_box get_game_object_collision_box(struct game_object *obj)
     return box;
 }
 
-struct collision_box get_entity_collision_box(struct entity *ent)
+Collision_box get_entity_collision_box(Entity *ent)
 {
-    struct collision_box box;
+    Collision_box box;
     box.x_left = ent->position.x;
     box.x_right = ent->position.x + ent->width;
     box.y_top = ent->position.y - ent->height;
@@ -281,7 +281,7 @@ void game_tick()
     {
 
         // Get the entity.
-        struct entity *ent = &entities[i];
+        Entity *ent = &entities[i];
 
         // Check if the entity is active.
         if (!ent->active)
@@ -338,7 +338,7 @@ void game_draw()
         if (i < MAX_GAME_OBJECTS)
         {
             // Get the game object.
-            struct game_object *obj = &game_objects[i];
+            Game_object *obj = &game_objects[i];
 
             // Check if the game object is active.
             if (obj->active && obj->is_visible)
@@ -357,7 +357,7 @@ void game_draw()
         if (i < MAX_ENTITIES)
         {
             // Get the entity.
-            struct entity *ent = &entities[i];
+            Entity *ent = &entities[i];
 
             // Check if the entity is active.
             if (ent->active && ent->is_visible)
@@ -376,7 +376,7 @@ void game_draw()
         if (i < MAX_LABELS)
         {
             // Get the label.
-            struct label *lbl = &labels[i];
+            Label *lbl = &labels[i];
 
             // Check if the label is active.
             if (lbl->active)

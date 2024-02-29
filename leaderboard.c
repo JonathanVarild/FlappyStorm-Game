@@ -3,8 +3,8 @@
 #include "scenes.h"
 #include "player_manager.h"
 
-static struct label *title;
-static struct label *rows[3];
+static Label *title;
+static Label *rows[3];
 
 static int highscore_order[3] = {0, 1, 2};
 static char formatted_highscores[3][4] = {"000", "000", "000"};
@@ -115,7 +115,7 @@ void init_leaderboardscene()
     generate_highscore_rows();
 
     // Create the title.
-    title = create_label("Leaderboard", (struct vector2D){64, 0}, true, false);
+    title = create_label("Leaderboard", (Vector2D){64, 0}, true, false);
 
     int i;
     for (i = 0; i < 3; i++)
@@ -128,7 +128,7 @@ void init_leaderboardscene()
         }
 
         // Create the highscore row.
-        rows[i] = create_label(highscore_rows[i], (struct vector2D){64, 8 + i * 8}, true, false);
+        rows[i] = create_label(highscore_rows[i], (Vector2D){64, 8 + i * 8}, true, false);
     }
 }
 
