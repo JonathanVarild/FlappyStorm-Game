@@ -252,35 +252,23 @@ Getters
 */
 
 // Function used to get the collision box of a game object.
-Collision_box get_game_object_collision_box(Game_object *obj)
+void get_game_object_collision_box(Collision_box *box, Game_object *obj)
 {
-    // Create a collision box.
-    Collision_box box;
-
     // Set the collision box values.
-    box.x_left = obj->position.x;
-    box.x_right = obj->position.x + obj->width;
-    box.y_top = obj->position.y - obj->height;
-    box.y_bottom = obj->position.y;
-
-    // Return the collision box.
-    return box;
+    box->x_left = obj->position.x;
+    box->x_right = obj->position.x + obj->width;
+    box->y_top = obj->position.y - obj->height;
+    box->y_bottom = obj->position.y;
 }
 
 // Function used to get the collision box of an entity.
-Collision_box get_entity_collision_box(Entity *ent)
+void get_entity_collision_box(Collision_box *box, Entity *ent)
 {
-    // Create a collision box.
-    Collision_box box;
-
     // Set the collision box values.
-    box.x_left = ent->position.x;
-    box.x_right = ent->position.x + ent->width;
-    box.y_top = ent->position.y - ent->height;
-    box.y_bottom = ent->position.y;
-
-    // Return the collision box.
-    return box;
+    box->x_left = ent->position.x;
+    box->x_right = ent->position.x + ent->width;
+    box->y_top = ent->position.y - ent->height;
+    box->y_bottom = ent->position.y;
 }
 
 /*
@@ -389,8 +377,11 @@ void game_tick()
             // Apply gravity.
             ent->velocity.y = ent->velocity.y < 3 ? ent->velocity.y + 0.2 : 3;
 
+            Collision_box ent_box;
+            get_entity_collision_box(&ent_box, ent);
+
             // Check if the entity is touching the ground.
-            if (get_entity_collision_box(ent).y_bottom >= game_get_ground_level())
+            if (ent_box.y_bottom >= game_get_ground_level())
             {
                 // Set the entity on the ground.
                 ent->on_ground = true;
@@ -399,7 +390,7 @@ void game_tick()
                 ent->position.y = game_get_ground_level();
                 ent->velocity.y = 0;
             }
-            else if (get_entity_collision_box(ent).y_top < 0)
+            else if (ent_box.y_top < 0)
             {
                 // Set the entity position to the top level and remove the y velocity.
                 ent->position.y = ent->height;

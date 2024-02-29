@@ -358,7 +358,8 @@ static void update_gamescene()
     }
 
     // Get the player coliision box.
-    Collision_box player_box = get_entity_collision_box(player);
+    Collision_box player_box;
+    get_entity_collision_box(&player_box, player);
 
     // Loop through all level objects.
     int i;
@@ -374,7 +375,8 @@ static void update_gamescene()
             if (obstacles[i]->type == PIPE || obstacles[i]->type == CLOUD_LIGHTNING)
             {
                 // Get the collision box of the obstacle.
-                Collision_box obstacle_box = get_game_object_collision_box(obstacles[i]);
+                Collision_box obstacle_box;
+                get_game_object_collision_box(&obstacle_box, obstacles[i]);
 
                 // Check if the player is colliding with the obstacle.
                 if (player_box.x_right > obstacle_box.x_left && player_box.x_left < obstacle_box.x_right && player_box.y_bottom > obstacle_box.y_top && player_box.y_top < obstacle_box.y_bottom)
@@ -391,7 +393,8 @@ static void update_gamescene()
                 set_game_object_position(lightnings[i], (Vector2D){obstacles[i]->position.x + icon_lightning_width / 2, obstacles[i]->position.y + icon_lightning_height + 3});
 
                 // Get the collision box of the player.
-                Collision_box lightning_box = get_game_object_collision_box(lightnings[i]);
+                Collision_box lightning_box;
+                get_game_object_collision_box(&lightning_box ,lightnings[i]);
 
                 // Check if the player is colliding with the lightning.
                 if (player_box.x_right > lightning_box.x_left && player_box.x_left < lightning_box.x_right && player_box.y_bottom > lightning_box.y_top && player_box.y_top < lightning_box.y_bottom)
@@ -466,7 +469,8 @@ static void update_gamescene()
             set_game_object_position(powerups[i], (Vector2D){powerups[i]->position.x - movement_speed, powerups[i]->position.y});
 
             // Get the collision box of the powerup.
-            Collision_box powerup_box = get_game_object_collision_box(powerups[i]);
+            Collision_box powerup_box;
+            get_game_object_collision_box(&powerup_box ,powerups[i]);
 
             // Check if the player is colliding with the powerup.
             if (player_box.x_right > powerup_box.x_left && player_box.x_left < powerup_box.x_right && player_box.y_bottom > powerup_box.y_top && player_box.y_top < powerup_box.y_bottom)

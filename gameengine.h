@@ -86,8 +86,8 @@ void set_entity_visibility(Entity *ent, bool visible);
 void set_game_object_visibility(Game_object *obj, bool visible);
 
 // Getters.
-Collision_box get_game_object_collision_box(Game_object *obj);
-Collision_box get_entity_collision_box(Entity *ent);
+void get_game_object_collision_box(Collision_box *box, Game_object *obj);
+void get_entity_collision_box(Collision_box *box, Entity *ent);
 
 // Create pointers for engine functions.
 void (*on_game_tick)(void);
