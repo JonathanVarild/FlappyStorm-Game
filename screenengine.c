@@ -132,12 +132,6 @@ void display_init()
     OSCCON &= ~0x180000;
     OSCCON |= 0x080000;
 
-    /* Set up output pins */
-    AD1PCFG = 0xFFFF;
-    ODCE = 0x0;
-    TRISECLR = 0xFF;
-    PORTE = 0x0;
-
     /* Output pins for display signals */
     PORTF = 0xFFFF;
     PORTG = (1 << 9);
@@ -145,10 +139,6 @@ void display_init()
     ODCG = 0x0;
     TRISFCLR = 0x70;
     TRISGCLR = 0x200;
-
-    /* Set up input pins */
-    TRISDSET = (1 << 8);
-    TRISFSET = (1 << 1);
 
     /* Set up SPI as master */
     SPI2CON = 0;
