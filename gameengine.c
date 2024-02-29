@@ -1,84 +1,16 @@
+#include "gameengine.h"
 #include <stdbool.h>
 #include <stdlib.h>
 #include "screenengine.h"
 #include <stdint.h>
 
-#define MAX_GAME_OBJECTS 32
-#define MAX_ENTITIES 32
-#define MAX_LABELS 16
-#define DRAW_LOOP 64
-
-/*
-Utility functions
-*/
-
-double game_uptime = 0;
-
-double get_game_uptime()
-{
-    return game_uptime;
-}
-
-/*
-Structs
-*/
-
-struct vector2D
-{
-    double x;
-    double y;
-};
-
-struct collision_box
-{
-    int x_left;
-    int x_right;
-    int y_top;
-    int y_bottom;
-};
-
-struct game_object
-{
-    bool active;
-    bool is_visible;
-    struct vector2D position;
-    int width;
-    int height;
-    double age;
-    int type;
-    uint8_t *graphic;
-};
-
-struct entity
-{
-    bool active;
-    bool is_visible;
-    struct vector2D position;
-    struct vector2D velocity;
-    bool on_ground;
-    int width;
-    int height;
-    double age;
-    int type;
-    uint8_t *graphic;
-};
-
-struct label
-{
-    bool active;
-    char *text;
-    struct vector2D position;
-    int x_offset;
-    bool selected;
-};
-
 /*
 Object arrays
 */
 
-struct game_object game_objects[MAX_GAME_OBJECTS] = {0};
-struct entity entities[MAX_ENTITIES] = {0};
-struct label labels[MAX_LABELS] = {0};
+static struct game_object game_objects[MAX_GAME_OBJECTS] = {0};
+static struct entity entities[MAX_ENTITIES] = {0};
+static struct label labels[MAX_LABELS] = {0};
 
 /*
 Creation functions
@@ -285,10 +217,14 @@ struct collision_box get_entity_collision_box(struct entity *ent)
 /*
 Engine functions
 */
+static double game_uptime = 0;
+static bool game_paused = false;
+static int ground_level = 32;
 
-void (*on_game_tick)(void);
-bool game_paused = false;
-int ground_level = 32;
+double get_game_uptime()
+{
+    return game_uptime;
+}
 
 void set_game_paused(bool paused)
 {
@@ -457,13 +393,9 @@ void game_draw()
 Interrupts
 */
 
-void (*button_4_click)(void);
-void (*button_3_click)(void);
-void (*button_2_click)(void);
-
-bool button_4_activated = false;
-bool button_3_activated = false;
-bool button_2_activated = false;
+static bool button_4_activated = false;
+static bool button_3_activated = false;
+static bool button_2_activated = false;
 
 void user_isr(void)
 {

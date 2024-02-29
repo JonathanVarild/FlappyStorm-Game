@@ -8,8 +8,7 @@
 #define MAX_GAME_OBJECTS 32
 #define MAX_ENTITIES 32
 #define MAX_LABELS 16
-
-extern double get_game_uptime(void);
+#define DRAW_LOOP 32
 
 struct vector2D {
     double x;
@@ -57,10 +56,6 @@ struct label {
     bool selected;
 };
 
-extern struct game_object game_objects[MAX_GAME_OBJECTS];
-extern struct entity entities[MAX_ENTITIES];
-extern struct label labels[MAX_LABELS];
-
 struct game_object *create_game_object(struct vector2D pos, int width, int height);
 struct entity *create_entity(struct vector2D pos, int width, int height);
 struct label *create_label(char *text, struct vector2D pos, bool centered, bool selected);
@@ -85,8 +80,9 @@ void set_game_object_visibility(struct game_object *obj, bool visible);
 struct collision_box get_game_object_collision_box(struct game_object *obj);
 struct collision_box get_entity_collision_box(struct entity *ent);
 
-extern void (*on_game_tick)(void);
+void (*on_game_tick)(void);
 
+double get_game_uptime(void);
 void set_game_paused(bool paused);
 bool get_game_paused();
 void game_set_ground_level(int level);
@@ -95,8 +91,8 @@ void game_init(void);
 void game_tick(void);
 void game_draw(void);
 
-extern void (*button_4_click)(void);
-extern void (*button_3_click)(void);
-extern void (*button_2_click)(void);
+void (*button_4_click)(void);
+void (*button_3_click)(void);
+void (*button_2_click)(void);
 
 #endif
