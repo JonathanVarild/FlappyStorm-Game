@@ -2,9 +2,10 @@
 This project includes small amounts of code written by other developers.
 Such code can be identified by this file and/or by the code comment seen below.
 
+```
 // External Code Reference:
 // Source: 
-
+```
 
 ## List of Third-Party Code
 Below is a list of third-party code incorporated into this project, along with attribution and license information for each.
@@ -32,6 +33,7 @@ Below is a list of third-party code incorporated into this project, along with a
  * This copyright notice added 2015 by F Lundevall
 
  * License
+ ```
  Copyright (c) 2015, Axel Isaksson
  Copyright (c) 2015, F Lundevall
 
@@ -60,4 +62,4 @@ Below is a list of third-party code incorporated into this project, along with a
  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
+```
