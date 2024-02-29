@@ -39,4 +39,4 @@ This project was created as a final project for the course IS1200 - Computer Har
 
 ## Credits:
 This project includes small amounts of code written by other developers.
-See credits.md for more information!
+See [CREDITS.md](CREDITS.md) for more information!
