@@ -12,13 +12,8 @@ static char highscore_rows[3][15] = {"1: ", "2: ", "3: "};
 
 static int selected_item;
 
-// Give these functions a bigger scope.
-void(init_leaderboardscene)();
-void(unload_leaderboardscene)();
-void(update_leaderboardscene)();
-
 // Function to get the current score.
-void format_highscores()
+static void format_highscores()
 {
     int i;
     for (i = 0; i < 3; i++)
@@ -34,7 +29,7 @@ void format_highscores()
     }
 }
 
-void calculate_highscore_order()
+static void calculate_highscore_order()
 {
     int i, j;
     for (i = 0; i < 3; i++)
@@ -51,7 +46,7 @@ void calculate_highscore_order()
     }
 }
 
-void generate_highscore_rows()
+static void generate_highscore_rows()
 {
     int i;
     for (i = 0; i < 3; i++)
@@ -92,7 +87,7 @@ void generate_highscore_rows()
     }
 }
 
-void go_back()
+static void go_back()
 {
     unload_leaderboardscene();
     init_menuscene();
