@@ -8,7 +8,6 @@
 void init_menuscene(void);
 void unload_menuscene(void);
 
-
 void init_gamescene(int selected_player_ID);
 void unload_gamescene(void);
 

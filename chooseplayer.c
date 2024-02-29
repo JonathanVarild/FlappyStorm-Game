@@ -8,11 +8,6 @@ static Label *menu_items[3];
 
 static int selected_item;
 
-// Give these functions a bigger scope.
-void(init_playerscene)();
-void(unload_playerscene)();
-void(update_playerscene)();
-
 static void select_item()
 {
     unload_playerscene();
