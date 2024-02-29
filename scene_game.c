@@ -84,6 +84,7 @@ static void remove_all_objects()
             remove_game_object(powerups[i]);
         }
 
+        // Set the objects to NULL.
         obstacles[i] = NULL;
         lightnings[i] = NULL;
         rain_drops[i] = NULL;
@@ -116,7 +117,7 @@ static void jump()
             // Reset the game scene.
             alive = true;
             unload_gamescene();
-            init_gamescene(player_ID);
+            load_gamescene(player_ID);
         }
         else
         {
@@ -138,12 +139,16 @@ static void go_left()
     // Check if the game is paused.
     if (get_game_paused())
     {
+        // Unload the game scene and load the menu scene.
         unload_gamescene();
-        init_menuscene();
+        load_menuscene();
     }
     else
     {
+        // Update random seed.
         set_random_seed(get_game_uptime() * 100 * (player->position.x + player->position.y + player->velocity.x + player->velocity.y));
+
+        // Make the bird fly left.
         set_entity_velocity(player, (Vector2D){-3, player->velocity.y});
     }
 }
@@ -154,12 +159,16 @@ static void go_right()
     // Check if the game is paused.
     if (get_game_paused())
     {
+        // Unload the game scene and load the menu scene.
         unload_gamescene();
-        init_menuscene();
+        load_menuscene();
     }
     else
     {
+        // Update random seed.
         set_random_seed(get_game_uptime() * 100 * (player->position.x + player->position.y + player->velocity.x + player->velocity.y));
+
+        // Make the bird fly right.
         set_entity_velocity(player, (Vector2D){3, player->velocity.y});
     }
 }
@@ -167,7 +176,7 @@ static void go_right()
 // Function to end the game.
 static void game_over()
 {
-    // Check if the player is invincible.
+    // Stop if the player is invincible.
     if (invincible_until > get_game_uptime())
     {
         return;
@@ -200,75 +209,112 @@ static void game_over()
     alive = false;
 }
 
+// Function to generate a rain drop.
 static void generate_rain_drop(Vector2D pos)
 {
+    // Loop through all rain drops.
     int i;
     for (i = 0; i < 20; i++)
     {
+        // Check if the rain drop is not active.
         if (rain_drops[i] == NULL || !rain_drops[i]->active)
         {
+            // Create the rain drop.
             rain_drops[i] = create_entity(pos, 1, 1);
             return;
         }
     }
 }
 
+// Function to generate a pipe.
 static void generate_pipes()
 {
+    // Get random y offset.
     int y_offset = get_random_int(-2, 2);
+
+    // Variable to store if the next pipe should be an upper pipe.
     bool upper_pipe = true;
+
+    // Loop through all obstacles.
     int i;
     for (i = 0; i < 20; i++)
     {
+        // Check if the obstacle is not active.
         if (obstacles[i] == NULL || !obstacles[i]->active)
         {
+            // Check if we are creating an upper or lower pipe.
             if (upper_pipe)
             {
+                // Create the upper pipe.
                 obstacles[i] = create_game_object((Vector2D){128 + icon_pipe_upper_width, 7 + y_offset}, icon_pipe_upper_width, icon_pipe_upper_height);
+
+                // Set the graphic and type of the pipe.
                 set_game_object_graphic(obstacles[i], icon_pipe_upper);
                 set_game_object_type(obstacles[i], PIPE);
+
+                // Set the next pipe to be a lower pipe.
                 upper_pipe = false;
             }
             else
             {
+                // Create the lower pipe.
                 obstacles[i] = create_game_object((Vector2D){128 + icon_pipe_lower_width, 35 + y_offset}, icon_pipe_lower_width, icon_pipe_lower_height);
+
+                // Set the graphic and type of the pipe.
                 set_game_object_graphic(obstacles[i], icon_pipe_lower);
                 set_game_object_type(obstacles[i], PIPE);
+
+                // Stop the function.
                 return;
             }
         }
     }
 }
 
+// Function to generate a cloud.
 static void generate_cloud()
 {
+    // Loop through all obstacles.
     int i;
     for (i = 0; i < 20; i++)
     {
+        // Check if the obstacle is not active.
         if (obstacles[i] == NULL || !obstacles[i]->active)
         {
-            int y_offset = get_random_int(-2, 4);
+            // Create the cloud.
+            obstacles[i] = create_game_object((Vector2D){128 + icon_cloud_width, 10 + get_random_int(-2, 4)}, icon_cloud_width, icon_cloud_height);
 
-            obstacles[i] = create_game_object((Vector2D){128 + icon_cloud_width, 10 + y_offset}, icon_cloud_width, icon_cloud_height);
+            // Set the graphic and type of the cloud.
             set_game_object_graphic(obstacles[i], icon_cloud);
             set_game_object_type(obstacles[i], CLOUD);
 
+            // Set the next lightning and rain drop spawn time.
             next_lightnings[i] = get_game_uptime() + 5;
             next_rain_drops[i] = get_game_uptime() + 1;
+
+            // Stop the function.
             return;
         }
     }
 }
 
+// Function to generate a powerup.
 static void generate_powerup()
 {
+    // Loop through all powerups.
     int i;
     for (i = 0; i < 20; i++)
     {
+        // Check if the powerup is not active.
         if (powerups[i] == NULL || !powerups[i]->active)
         {
+            // Create the powerup.
             powerups[i] = create_game_object((Vector2D){128 + icon_star_width, get_random_int(icon_star_height, 32)}, icon_star_width, icon_star_height);
+
+            // Set the graphic of the powerup.
             set_game_object_graphic(powerups[i], icon_star);
+
+            // Stop the function.
             return;
         }
     }
@@ -283,17 +329,20 @@ static void update_gamescene()
         // Spawn the obstacle and set the next obstacle respawn.
         next_obstacle = get_game_uptime() + spawn_rate;
 
+        // Increase the difficulty by decreasing the spawn rate.
         if (spawn_rate - 0.15 > 2) {
             spawn_rate -= 0.15;
         }
 
+        // Increase the difficulty by increasing the movement speed.
         if (movement_speed + 0.01 < 0.4) {
             movement_speed += 0.01;
         }
 
-        // Get random number.
+        // Get random number to determine what to spawn.
         int r = get_random_int(0, 20);
 
+        // Generate obstacle based on random number.
         if (r < 2)
         {
             generate_powerup();
@@ -330,6 +379,7 @@ static void update_gamescene()
                 // Check if the player is colliding with the obstacle.
                 if (player_box.x_right > obstacle_box.x_left && player_box.x_left < obstacle_box.x_right && player_box.y_bottom > obstacle_box.y_top && player_box.y_top < obstacle_box.y_bottom)
                 {
+                    // End the game.
                     game_over();
                 }
             }
@@ -352,9 +402,14 @@ static void update_gamescene()
                 // Check if the lightning is old.
                 if (lightnings[i]->age + 0.3 < get_game_uptime())
                 {
+                    // Remove the lightning.
                     remove_game_object(lightnings[i]);
+
+                    // Set the object to a normal cloud.
                     set_game_object_type(obstacles[i], CLOUD);
                     set_game_object_graphic(obstacles[i], icon_cloud);
+
+                    // Set the lightning to NULL.
                     lightnings[i] = NULL;
                 }
             }
@@ -362,21 +417,28 @@ static void update_gamescene()
             // Check if the cloud should spawn a lightning.
             if (obstacles[i]->type == CLOUD && next_lightnings[i] < get_game_uptime())
             {
+                // Set the next lightning spawn time.
                 next_lightnings[i] = get_game_uptime() + 2 + get_random_int(0, 2);
 
+                // Create the lightning.
                 lightnings[i] = create_game_object((Vector2D){obstacles[i]->position.x + icon_lightning_width / 2, obstacles[i]->position.y + icon_lightning_height + 1}, icon_lightning_width, icon_lightning_height);
+                
+                // Set the graphic and type of the lightning.
                 set_game_object_graphic(lightnings[i], icon_lightning);
                 set_game_object_type(lightnings[i], LIGHTNING);
 
-                set_game_object_type(obstacles[i], CLOUD_LIGHTNING);
+                // Set the graphic and type of the cloud.
                 set_game_object_graphic(obstacles[i], icon_lightningcloud);
+                set_game_object_type(obstacles[i], CLOUD_LIGHTNING);
             }
 
             // Check if the cloud should spawn a rain drop.
             if (obstacles[i]->type == CLOUD && next_rain_drops[i] < get_game_uptime())
             {
+                // Set the next rain drop spawn time.
                 next_rain_drops[i] = get_game_uptime() + 0.5 + get_random_int(1, 2);
 
+                // Create the rain drop.
                 generate_rain_drop((Vector2D){obstacles[i]->position.x + get_random_int(-icon_cloud_width / 2, icon_cloud_width / 2), obstacles[i]->position.y});
             }
 
@@ -409,16 +471,20 @@ static void update_gamescene()
             // Check if the player is colliding with the powerup.
             if (player_box.x_right > powerup_box.x_left && player_box.x_left < powerup_box.x_right && player_box.y_bottom > powerup_box.y_top && player_box.y_top < powerup_box.y_bottom)
             {
+                // Remove the powerup.
                 remove_game_object(powerups[i]);
                 powerups[i] = NULL;
 
-                int difficulty_sub = (int)(get_game_uptime() - start_time) / 10;
+                // Calculate the difficulty offset.
+                int difficulty_offset = (int)(get_game_uptime() - start_time) / 10;
 
-                if (difficulty_sub > 7) {
-                    difficulty_sub = 7;
+                // Set a max offset of 7.
+                if (difficulty_offset > 7) {
+                    difficulty_offset = 7;
                 }
 
-                invincible_until = get_game_uptime() + 10 - difficulty_sub;
+                // Set the invincible time.
+                invincible_until = get_game_uptime() + 10 - difficulty_offset;
             }
         }
 
@@ -441,50 +507,58 @@ static void update_gamescene()
     // Update location of ground.
     set_game_object_position(ground, (Vector2D){ground->position.x - movement_speed, ground->position.y});
 
-    // Update location of ground if it goes off screen.
+    // Check if the ground is almost off screen.
     if (ground->position.x <= 0)
     {
+        // Move the ground back to the right.
         set_game_object_position(ground, (Vector2D){ground->position.x + ground->width / 2, 32});
     }
 
     // Get the current score.
     get_score(score_text);
 
-    // Update label if the score has changed.
+    // Check what to display on the top label.
     if (invincible_until > get_game_uptime())
     {
+        // Display "INVINCIBLE" when the player is invincible.
         set_label_text(top_label, "INVINCIBLE", true);
     }
     else if (top_label->text != score_text && !get_game_paused())
     {
+        // Display score when the score changes and the game isn't paused.
         set_label_text(top_label, score_text, true);
     }
 
     // Check if the player is invincible.
     if (invincible_until > get_game_uptime())
     {
+        // Make the player flicker.
         set_entity_visibility(player, (int)(get_game_uptime() * 10) % 2);
     }
     else
     {
+        // Make the player visible.
         set_entity_visibility(player, true);
     }
 
     // Check if the player is on the ground.
     if (player->on_ground)
     {
+        // End the game.
         game_over();
     }
 
     // Check if the player is colliding with the world edges.
     if (player->position.x < 0 || player->position.x > 128)
     {
+        // Set the player velocity to 0 and set the position to the edge of the world.
         set_entity_velocity(player, (Vector2D){0, player->velocity.y});
         set_entity_position(player, (Vector2D){player->position.x < 0 ? 0 : 128, player->position.y});
     }
 }
 
-void init_gamescene(int selected_player_ID)
+// Function to load the game scene.
+void load_gamescene(int selected_player_ID)
 {
     // Set the player.
     player_ID = selected_player_ID;

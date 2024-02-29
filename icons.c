@@ -1,3 +1,4 @@
+// Create icon for the bird.
 char icon_bird[] = {
     0x7C,
     0x00,
@@ -17,6 +18,7 @@ char icon_bird[] = {
     0x00,
 };
 
+// Create icon for the cloud obstacles.
 char icon_cloud[] = {
     0xC0,
     0x03,
@@ -38,6 +40,7 @@ char icon_cloud[] = {
     0x3F,
 };
 
+// Create icon for when the cloud emits a lightning bolt.
 char icon_lightningcloud[] = {
     0x80,
     0x03,
@@ -59,6 +62,7 @@ char icon_lightningcloud[] = {
     0x3F,
 };
 
+// Create an icon for the lightning bolt.
 char icon_lightning[] = {
     0x04,
     0x02,
@@ -69,6 +73,7 @@ char icon_lightning[] = {
     0x01,
 };
 
+// Create an icon for the lower pipe obstacle.
 char icon_pipe_lower[] = {
     0xFF,
     0x07,
@@ -98,6 +103,7 @@ char icon_pipe_lower[] = {
     0x01,
 };
 
+// Create an icon for the upper pipe obstacle.
 char icon_pipe_upper[] = {
     0x04,
     0x01,
@@ -127,6 +133,7 @@ char icon_pipe_upper[] = {
     0x07,
 };
 
+// Create an icon for the star power-up.
 char icon_star[] = {
     0x20,
     0x00,
@@ -152,6 +159,7 @@ char icon_star[] = {
     0x01,
 };
 
+// Create an icon for the ground.
 char icon_ground[] = {
     0xFF,
     0xFF,

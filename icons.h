@@ -1,6 +1,7 @@
 #ifndef ICONS_H
 #define ICONS_H
 
+// Define the icon dimensions for all icons.
 #define icon_bird_width 10
 #define icon_bird_height 8
 
@@ -25,6 +26,7 @@
 #define icon_ground_width 256
 #define icon_ground_height 2
 
+// Declare the icons as external variables.
 extern char icon_bird[];
 extern char icon_cloud[];
 extern char icon_lightningcloud[];

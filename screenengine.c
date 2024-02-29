@@ -14,8 +14,10 @@
 #define DISPLAY_RESET_PORT PORTG
 #define DISPLAY_RESET_MASK 0x200
 
+// Matrix for the display pixels.
 static uint8_t display_matrix[4][128] = {0};
 
+// Array for the text font.
 static uint8_t text_font[95][8] = {
     {0, 0, 0, 94, 0, 0, 0, 0},        // '!'
     {0, 0, 4, 3, 4, 3, 0, 0},         // '"'
@@ -114,16 +116,16 @@ static uint8_t text_font[95][8] = {
     {0, 0, 0, 0, 0, 0, 0, 0},         // ' '
 };
 
+// Function to communicate with the display.
 static uint8_t spi_send_recv(uint8_t data)
 {
-    while (!(SPI2STAT & 0x08))
-        ;
+    while (!(SPI2STAT & 0x08));
     SPI2BUF = data;
-    while (!(SPI2STAT & 0x01))
-        ;
+    while (!(SPI2STAT & 0x01));
     return SPI2BUF;
 }
 
+// Function to initialize the display.
 void display_init()
 {
     /* Set up peripheral bus clock */
@@ -189,83 +191,101 @@ void display_init()
     spi_send_recv(0xAF);
 }
 
+// Function to update the display.
 void display_update()
 {
+    // Loop through the 4 segments (rows).
     int i, j;
     for (i = 0; i < 4; i++)
     {
-        DISPLAY_COMMAND_DATA_PORT &= ~DISPLAY_COMMAND_DATA_MASK; // Förbereder nytt kommando
-        spi_send_recv(0x22);                                     // Väljer den aktuella raden som ska uppdateras. 0x22 är kommandot för att sätta radadressen.
-        spi_send_recv(i);                                        // Vilken rad som ska uppdateras.
+        // Prepare a new command.
+        DISPLAY_COMMAND_DATA_PORT &= ~DISPLAY_COMMAND_DATA_MASK;
 
-        spi_send_recv(0x0);  // ????
-        spi_send_recv(0x10); // ????
+        // Set the segment to update.
+        spi_send_recv(0x22);
+        spi_send_recv(i);
 
-        DISPLAY_COMMAND_DATA_PORT |= DISPLAY_COMMAND_DATA_MASK; // Förbereder nytt data
+        spi_send_recv(0x0);
+        spi_send_recv(0x10);
 
+        // Prepare a new command.
+        DISPLAY_COMMAND_DATA_PORT |= DISPLAY_COMMAND_DATA_MASK;
+
+        // Loop through the 128 columns.
         for (j = 0; j < 128; j++)
         {
+            // Send the data for each 8 pixels.
             spi_send_recv(display_matrix[i][j]);
         }
     }
 }
 
-void matrix_reset()
+// Function to clear the display.
+void clear_display()
 {
-    // Reset the displaymatrix to all zeros.
+    // Loop through the 4 segments (rows).
     int j, k;
     for (j = 0; j < 4; j++)
     {
+        // Loop through the 128 columns.
         for (k = 0; k < 128; k++)
         {
+            // Clear the pixel.
             display_matrix[j][k] = 0;
         }
     }
 }
 
+// Function to draw a pixel on the display.
 void draw_pixel(int x, int y)
 {
+    // Check if the pixel is out of bounds.
     if (x < 0 || x >= DISPLAY_WIDTH || y < 0 || y >= DISPLAY_HEIGHT)
     {
         return;
     }
 
+    // Calculate the segment and column data.
     int segment = y / 8;
     int columnData = 1 << (y % 8);
+
+    // Set the pixel.
     display_matrix[segment][x] |= columnData;
 }
 
+// Function to draw a rectangle on the display.
 void draw_rect(int x, int y, int width, int height)
 {
 
     // Set i and j.
     int i, j;
 
-    // Loop through the rows pixel by pixel.
+    // Loop through height.
     for (i = y; i < y + height; i++)
     {
+        // Loop through width.
         for (j = x; j < x + width; j++)
         {
+            // Draw each pixel.
             draw_pixel(j, i);
         }
     }
 }
 
+// Function to draw text on the display.
 void draw_text(int x, int y, char *text, bool selected)
 {
-    // Declare variables.
+    // Set variables.
     int i, j, k;
     int char_index = 0;
 
-    // Loop through the text.
+    // Loop through the text to draw.
     for (i = 0; text[i] != '\0'; i++)
     {
-
-        // Loop through the data-line for each char.
+        // Loop through the columns for each char.
         for (j = 0; j < 8; j++)
         {
-
-            // Get the data for the char.
+            // Declare the char data.
             uint8_t char_data;
 
             // Check if the char is a special char.
@@ -288,13 +308,13 @@ void draw_text(int x, int y, char *text, bool selected)
             // Loop through the column for each char.
             for (k = 0; k < 8; k++)
             {
-
-                // Check if the column/pixel should be drawn.
+                // Check if the column/pixel should be drawn based on the font and if the char is selected.
                 if (!selected && (char_data & (1 << k)))
                 {
                     draw_pixel(x + char_index * 8 + j, y + k);
                 }
 
+                // Check if the column/pixel should be drawn based on the font and if the char is selected. (inverted)
                 if (selected && !(char_data & (1 << k)))
                 {
                     draw_pixel(x + char_index * 8 + j, y + k);
@@ -302,35 +322,38 @@ void draw_text(int x, int y, char *text, bool selected)
             }
         }
 
+        // Increase the char index.
         char_index++;
     }
 }
 
+// Function to draw a XBM icon on the display.
 void draw_graphic(int x, int y, int width, int height, uint8_t *graphic)
 {
-
+    // Set variables.
     int data = graphic[0];
     int index = 0;
-    int line = 0;
 
+    // Check if the width is divisible by 8.
     if (width % 8 != 0)
     {
+        // Set the width to the next multiple of 8.
         width = width + (8 - width % 8);
     }
 
+    // Loop through the graphic data.
     while (index < width * height)
     {
-
+        // Draw the pixel if the data is set.
         if (data & (1 << (index % 8)))
         {
             draw_pixel(x + (index % width), y + (index / width));
         }
 
+        // Increase the index.
         index++;
+
+        // Get the new data if the index is divisible by 8.
         data = graphic[index / 8];
-        if (index)
-        {
-            line++;
-        }
     }
 }
