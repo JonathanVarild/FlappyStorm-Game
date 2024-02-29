@@ -383,6 +383,7 @@ static void update_gamescene()
                 {
                     // End the game.
                     game_over();
+                    return;
                 }
             }
 
@@ -400,6 +401,7 @@ static void update_gamescene()
                 if (player_box.x_right > lightning_box.x_left && player_box.x_left < lightning_box.x_right && player_box.y_bottom > lightning_box.y_top && player_box.y_top < lightning_box.y_bottom)
                 {
                     game_over();
+                    return;
                 }
 
                 // Check if the lightning is old.
@@ -550,6 +552,7 @@ static void update_gamescene()
     {
         // End the game.
         game_over();
+        return;
     }
 
     // Check if the player is colliding with the world edges.
