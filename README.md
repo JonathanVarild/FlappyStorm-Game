@@ -10,7 +10,7 @@ Flappystorm is a Flappy Bird-inspired game with additional elements such as thun
 
 ## Features
 * 2D Game engine
-  * Basic object physics (Such as gravity)
+  * Basic object physics (Such as gravity & velocity)
   * Dynamic game objects (Static objects)
   * Dynamic entities (Interactive objects)
   * Dynamic text labels
