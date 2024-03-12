@@ -1,5 +1,5 @@
 # FlappyStorm-Game
-Flappystorm is a Flappy Bird-inspired game with additional elements such as thunderclouds, lightning strikes, and power-ups. The game has its own 2D game engine, providing multiple useful features such as physics, game object management, XMB icon compatibility, and support for dynamic text labels. This project was created as a final project for the IS1200 - Computer Hardware Engineering course at (KTH) Royal Institute of Technology in Sweden. It's my first project in C and left me with much new knowledge and experience in low-level programming. The code can run on a ChipKIT (PIC32) with an attached Basic I/O Shield.
+Flappystorm is a Flappy Bird-inspired game with additional elements such as thunderclouds, lightning strikes, and power-ups. The game has its own 2D game engine, providing multiple useful features such as physics, game object management, XMB icon compatibility, and support for dynamic text labels. This project was created as a final project for the Computer Hardware Engineering (IS1200) course at (KTH) Royal Institute of Technology in Sweden. It's my first project in C and left me with much new knowledge and experience in low-level programming. The code can run on a ChipKIT (PIC32) with an attached Basic I/O Shield.
 
 # Awards
 * [KTH - Course IS1200/IS1500 - Best Projects Awards 2024](https://i.imgur.com/lRxViFd.jpeg)
